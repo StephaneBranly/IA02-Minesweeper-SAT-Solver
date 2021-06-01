@@ -8,16 +8,17 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/01 15:50:16 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/01 15:59:40 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
-import sys # to have basic system functions
-from test import *
+import sys
+from test.test import test
 
 def main(argv):
     if len(argv) == 1:
-        sys.stdout.write("hello world")
+        test()
+        sys.stdout.write("\nhello world")
     elif len(argv) == 0:
         sys.stdout.write("no argument")
     sys.exit(0)
