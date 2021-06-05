@@ -8,20 +8,22 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/01 15:59:40 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/02 20:14:14 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
 import sys
 from test.test import test
+from moteur.moteur import *
 
 def main(argv):
     if len(argv) == 1:
         test()
-        sys.stdout.write("\nhello world")
+        sys.exit(0)
     elif len(argv) == 0:
         sys.stdout.write("no argument")
-    sys.exit(0)
+        sys.exit(0)
+    sys.exit(1)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
