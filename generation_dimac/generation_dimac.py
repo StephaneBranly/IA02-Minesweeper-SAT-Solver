@@ -77,7 +77,7 @@ def contrainte_info_connu(carte_connu:MapComplete) -> Clause_Base:
             vars:List[int] = cell_to_variables(i, j, m, n)
             case_ij:Case=carte_connu[1][i][j]
             if case_ij != None:
-                if case_ij["terrin"]=="terre":
+                if case_ij["type_case"]=="terre":
                     bc+=[[vars[1]]]
                 else:
                     bc+=[[vars[2]]]
@@ -154,7 +154,7 @@ def test():
     info['sea_count']=7
     info['land_count']=2
     #ajout des infos de la case initiale
-    case_initiale:Case = {"animal":None, "terrin":"merre", "visite":True, "voisin":(1, 0, 0)}
+    case_initiale:Case = {"animal":None, "type_case":"merre", "visite":True, "voisins":(1, 0, 0)}
     carte[0][0]=case_initiale
     print(carte)
 
