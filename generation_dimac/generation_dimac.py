@@ -13,24 +13,56 @@
 # ************************************************************************************************************************* #
 
 from typing import Dict, List, Tuple
+#from types_perso.types_perso import *
 import os.path
 import time
 import random
 from itertools import combinations
 
-
+#temporaire : c'est pour le test du fichier seul
 Case = Dict
 # type_case: "terre" | "mer"
 # animal: None | "C" | "R" | "T"
 # visite: boolean
 # voisins: (nb_croco: int, nb_requins: int, nb_tigres: int)
 
+Compte_Proximite = Tuple[int, int, int]
+Coord = Tuple[int,int]
+Info = Dict
+# {
+#     "pos": Coord, # (i, j) i < M, j < N 
+#     "field": str, # "sea"|"land"
+#     "prox_count": Compte_Proximite # (tiger_count, shark_count, croco_count), optional
+# }
+
+Infos = List[Info]
+
 GridInfo = Dict
+# {
+#     "m": int,
+#     "n": int,
+#     "start": (int, int),
+#     "tiger_count": int,
+#     "shark_count": int,
+#     "croco_count": int,
+#     "sea_count": int,
+#     "land_count": int,
+#     "3BV": int,
+#     "infos": Infos # Optional  
+# }
+
+Status = str # "OK"|"KO"|"Err"|"GG"
+Msg = str
+
+Grid = List[List[Case]]
+#fin du temporaire
+
+#alisas de type
 Map = List[List[Case]]
 Clause = List[int]
 Clause_Base = List[Clause]
-
 MapComplete = (GridInfo,Map)
+
 
 def cell_to_variables(i:int, j:int, m:int, n:int)->List[int]:
     depart:int=1+(i)*6*m+(j)*6
@@ -42,7 +74,7 @@ def cell_to_variables(i:int, j:int, m:int, n:int)->List[int]:
 
 def au_plus_un(vars: List[int]) -> Clause_Base: #entrée = [1, 2, 3]
     sortie: Clause_Base = [] 
-    for e in combinations(vars, 2): #e prend à chaque itération une valeur parmi {(1, 2) (2, 3), (1, 3)}
+    for e in combinations(vars, 2): 
         sortie.append([-e[0], -e[1]])
     return sortie #[[-1, -2], [-2, -3], [-1, -3]]
 
@@ -68,40 +100,40 @@ def contrainte_animal_terrin(m:int, n:int) -> Clause_Base:
             bc=bc+clause
     return bc
 
-def contrainte_info_connu(carte_connu:MapComplete) -> Clause_Base:
+#génère les contrainte pour les infos initiales
+#les autres information seront ajouter après
+def contrainte_info_connu(carte_connu:GridInfo) -> Clause_Base:
     bc:Clause_Base=[]
-    m:int = carte_connu[0]['m']
-    n:int = carte_connu[0]['n']
-    for i in range(m):
-        for j in range(n):
-            vars:List[int] = cell_to_variables(i, j, m, n)
-            case_ij:Case=carte_connu[1][i][j]
-            if case_ij != None:
-                if case_ij["type_case"]=="terre":
-                    bc+=[[vars[1]]]
-                else:
-                    bc+=[[vars[2]]]
-                if case_ij["animal"]=="C":
-                    bc+=[[vars[3]]]
-                elif case_ij["animal"]=="T":
-                    bc+=[[vars[4]]]
-                elif case_ij["animal"]=="R":
-                    bc+=[[vars[5]]]
-                else:
-                    bc+=[[vars[-3]], [vars[-4]], [vars[-5]]]
-
+    m:int = carte_connu['m']
+    n:int = carte_connu['n']
+    for case_ij in carte_connu['infos']:
+        i:int = case_ij['pos'][0]
+        j:int = case_ij['pos'][1]
+        vars:List[int] = cell_to_variables(i, j, m, n)
+        if case_ij["field"]=="terre":
+            bc+=[[vars[1]]]
+        else:
+            bc+=[[vars[2]]]
+        if case_ij["animal"]=="C":
+            bc+=[[vars[3]]]
+        elif case_ij["animal"]=="T":
+            bc+=[[vars[4]]]
+        elif case_ij["animal"]=="R":
+            bc+=[[vars[5]]]
+        else:
+            bc+=[[vars[-3]], [vars[-4]], [vars[-5]]]
     return bc
 
-def contrainte_voisin(carte_connu:MapComplete) -> Clause_Base:
+def contrainte_voisin(carte_connu:GridInfo) -> Clause_Base:
     bc:Clause_Base = []
-    m:int = carte_connu[0]['m']
-    n:int = carte_connu[0]['n']
+    m:int = carte_connu['m']
+    n:int = carte_connu['n']
     #to do
     return bc
 
-def generate_problem(carte_connu:MapComplete) -> Clause_Base:
-    m:int =carte_connu[0]['m']
-    n:int =carte_connu[0]['n']
+def generate_problem(carte_connu:GridInfo) -> Clause_Base:
+    m:int = carte_connu['m']
+    n:int = carte_connu['n']
     base: Clause_Base = []
     base = (
         base
@@ -112,6 +144,7 @@ def generate_problem(carte_connu:MapComplete) -> Clause_Base:
     )
     return base
 
+#met la base de clause sous forme de texte et l'écrit dans le dimac
 def write_dimac(clauses: Clause_Base, nb_vars: int) -> str:
     with open('./generation_dimac/dimac.cnf', 'w', newline='\n') as f:
         texte:str= "c\nc IA02 projet demineur ameliorer\nc\n"
@@ -122,47 +155,56 @@ def write_dimac(clauses: Clause_Base, nb_vars: int) -> str:
             texte += "0\n"
         f.write(texte)
 
-   
 
-
+def ajout_clause(clauses: Clause_Base) -> str:
+    #to do
+    return " "
 
 
 
 #cette fonction permet de tester. elle n'a pas pour vocation à rester
 #temporaire
 def test():
-    m=3
-    n=3
+    #définition des info de la carte
+    m:int = 3
+    n:int = 3
+    start:Tuple(int) = (0, 0)
+    tc:int = 0
+    sc:int = 0
+    cc:int = 0
+    seaC:int = 7
+    landC:int = 2
+
     #generation de la carte vide de la bonne taille
-    #represente le début : on n'a pas d'info du tout
-    carte=list(list(dict()))
-    for i in range(m):
-        ligne: List[Case]=list()
-        for j in range(n):
-            case: Case=None
-            ligne.append(case)
-        carte.append(ligne)
-    print(carte)
-    info: Dict=dict()
-    info['m']=m
-    info['n']=n
-    info['start']=(0, 0)
-    info['3BV']=0
-    info['tiger_count']=0
-    info['shark_count']=0
-    info['croco_count']=1
-    info['sea_count']=7
-    info['land_count']=2
+    #represente le début
+    carte: GridInfo=dict()
+    carte['m']=m
+    carte['n']=n
+    carte['start']=start
+    carte['3BV']=0
+    carte['tiger_count']=tc
+    carte['shark_count']=sc
+    carte['croco_count']=cc
+    carte['sea_count']=seaC
+    carte['land_count']=landC
+    carte['infos']=[]
     #ajout des infos de la case initiale
-    case_initiale:Case = {"animal":None, "type_case":"merre", "visite":True, "voisins":(1, 0, 0)}
-    carte[0][0]=case_initiale
-    print(carte)
+    case_initiale:Infos ={
+        "pos":start, 
+        "field":"sea", 
+        "prox_count":(0, 0, 1),
+        "animal":None
+    }
+    carte["infos"].append(case_initiale)
 
-    carte_info:MapComplete = (info, carte)
-
+    #génération initale du problème
     nb_vars=n*m*6
-    base: Clause_Base = generate_problem(carte_info)
+    base: Clause_Base = generate_problem(carte)
     write_dimac(base, nb_vars)
+
+    #ajout d'info (suite à un guess ou un discover)
+
+
 
 #temporaire
 test()
