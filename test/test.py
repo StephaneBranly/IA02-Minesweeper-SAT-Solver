@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/07 20:31:19 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/08 19:16:35 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -41,7 +41,7 @@ def test(chemin_solver: str, type_solver:str="opb"):
         changer_info_carte_courante_moteur(info_carte_courante)
         temps_depart: float = time.time()
         print(f"{couleurs.ATTENTION}Test sur {fichier}\t...{couleurs.FIN}", end='\r')
-        status: Status = jouer(info_carte_courante, fichier.split(".")[0], chemin_solver) 
+        status: Status = jouer(info_carte_courante, fichier.split(".")[0], chemin_solver,type_solver,guess,discover,None) 
         temps_ecoule: str = format(time.time() - temps_depart, '.3f') + "s"
         sauvegarder_historique('./test/historique_maps/'+fichier.split(".")[0]+'.txt')
         if status == "GG":

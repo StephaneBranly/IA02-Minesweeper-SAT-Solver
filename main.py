@@ -8,11 +8,11 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/07 18:14:12 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/08 18:51:48 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
-import sys, getopt
+import sys, getopt, os
 from test.test import test
 from types_perso.types_perso import *
 
@@ -48,22 +48,22 @@ def main(argv):
 
     if(nom_os=='linux'):
         if type_solver=="opb":
-            chemin_solver = "./solvers/toysat/linux64/toysat"
+            chemin_solver = "/solvers/toysat/linux64/toysat"
         elif type_solver=="cnf":
-            chemin_solver = "./solvers/gophersat/linux64/gophersat-1.1.6"
+            chemin_solver = "/solvers/gophersat/linux64/gophersat-1.1.6"
     elif(nom_os=='windows'):
         if type_solver=="opb":
-            #chemin_solver = ".\solvers\toysat\win64\toysat.exe"
-            chemin_solver = "toysat.exe"
+            chemin_solver = ".\solvers\toysat\win64\toysat.exe"
+            # chemin_solver = "toysat.exe"
         elif type_solver=="cnf":
-            chemin_solver = "./solvers/gophersat/win64/gophersat-1.1.6.exe"
+            chemin_solver = "/solvers/gophersat/win64/gophersat-1.1.6.exe"
     elif(nom_os=='macos'):
         if type_solver=="opb":
-            chemin_solver = "./solvers/toysat/macos64/toysat"
+            chemin_solver = "/solvers/toysat/macos64/toysat"
         elif type_solver=="cnf":
-            chemin_solver = "./solvers/gophersat/macos64/gophersat-1.1.6"
+            chemin_solver = "/solvers/gophersat/macos64/gophersat-1.1.6"
     if lancer_test:
-        test(chemin_solver)
+        test(os.getcwd()+chemin_solver)
         sys.exit(0)
 
     aide()
