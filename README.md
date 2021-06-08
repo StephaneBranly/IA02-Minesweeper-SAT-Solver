@@ -38,5 +38,20 @@ Résolution d'un problème style démineur.
     - utiliser si possible sur VS Code l'extension UTC-Header [github extension](https://github.com/StephaneBranly/vscode-utc-header)
 
 ## TO DO 
-- voir le fonctionnement de l'API
-- faire en sorte que l'on peut effectuer des tests facilement sur une multitude de maps créées en local
+- [ ] voir le fonctionnement de l'API
+- [x] faire en sorte que l'on peut effectuer des tests facilement sur une multitude de maps créées en local
+- [ ] etudier la parallelisation / creation de `thread`
+- [ ] tester en cnf pour comparer les performances
+- [ ] effectuer un test en priorite sur le type d'animal le plus present sur le reste de la map `(T,S,C,R)` => R pour rien
+- [ ] avant test final, retirer les commentaires dans le fichier
+
+## Optimisations actuelles
+- Gestion du fichier
+    - Lecture limitée au strict minimum
+    - Edition en `append` quand possible (pour éviter de devoir tout réécrire) 
+    - Sauvegarde de la position du curseur pour tester et modifier les hypothèses
+- Sélection des cases à tester
+    - Les cases ayant recues les dernieres informations sont testées en priorité
+- Test des hypothèses sur une case
+    - Test uniquement si le terrain est cohérent avec l'animal de l'hypothèse
+    - Test uniquement s'il reste encore sur la carte l'animal de l'hypothèse
