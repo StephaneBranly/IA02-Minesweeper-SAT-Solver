@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/05 21:56:21 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/06 17:37:00 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -133,7 +133,8 @@ def guess(i: int, j:int, animal: str) -> Tuple[Status, Msg, Infos]:
         return "KO", "", []
 
     else:   
-        info: Dict = dict()    
+        info: Dict = dict()   
+        info['pos'] = (i,j) 
         return jouer_case((i,j)), "Nice", [ajouter_terrain_dans_info((i,j), info)]
 
 def jouer_case(position: Coord) -> Status:

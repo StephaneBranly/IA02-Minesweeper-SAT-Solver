@@ -1,0 +1,15 @@
+* carte map0.map
++1 x1 = 0; * comptage total de T
++1 x2 = 0; * comptage total de S
++1 x3 = 0; * comptage total de C
++1 x5 = 1; * comptage total de s
++1 x6 = 0; * comptage total de l
++1 x1 +1 x2 +1 x3 +1 x4 = 1; * unicite animal case (0,0)
++1 x5 +1 x6 = 1; * unicite type terrain case (0,0)
++1 ~x2 +1 x5 >= 1; * non requin ou eau (0,0)
++1 ~x1 +1 x6 >= 1; * non tigre ou terre (0,0)
++1 x4 = 1; * case de depart (0,0)
++1 x4 = 1; * R sur la case 0,0
++1 x1 +1 x2 +1 x3  = 0; * les autres animaux ne sont pas sur la case 0,0
++1 x5 = 1; * case sea  (0,0)
++1 x6 = 0; * case non land  (0,0)
