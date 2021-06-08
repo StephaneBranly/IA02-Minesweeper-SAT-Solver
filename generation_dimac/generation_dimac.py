@@ -64,14 +64,6 @@ Clause_Base = List[Clause]
 MapComplete = (GridInfo,Map)
 
 
-def cell_to_variables(i:int, j:int, m:int, n:int)->List[int]:
-    depart:int=1+(i)*6*m+(j)*6
-    result:List[int]=[]
-    for i in range(6):
-        result.append(depart)
-        depart+=1
-    return result
-
 def au_plus_un(vars: List[int]) -> Clause_Base: #entrée = [1, 2, 3]
     sortie: Clause_Base = [] 
     for e in combinations(vars, 2): 
@@ -204,7 +196,29 @@ def test():
 
     #ajout d'info (suite à un guess ou un discover)
 
+def cell_to_variables1(i:int, j:int, m:int, n:int)->List[int]:
+    depart:int=i*6* n + j*6 + 1
+    result:List[int]=[]
+    for i in range(6):
+        result.append(depart)
+        depart+=1
+    return result
 
+def cell_to_variables(i:int, j:int, m:int, n:int)->List[int]:
+    depart:int=1+(i+j*m)*6
+    result:List[int]=[]
+    for i in range(6):
+        result.append(depart)
+        depart+=1
+    return result
 
 #temporaire
-test()
+#test()
+
+#print(cell_to_variables(4, 0, 8, 2))
+#print(cell_to_variables(3, 8, 8, 2))
+
+for i in range(8):
+    for j in range(3):
+        print("i="+str(i)+" j="+str(j))
+        print(cell_to_variables(i,j, 8, 3))
