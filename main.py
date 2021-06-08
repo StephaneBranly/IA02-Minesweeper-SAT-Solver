@@ -53,7 +53,7 @@ def main(argv):
             chemin_solver = "/solvers/gophersat/linux64/gophersat-1.1.6"
     elif(nom_os=='windows'):
         if type_solver=="opb":
-            chemin_solver = ".\solvers\toysat\win64\toysat.exe"
+            chemin_solver = "/solvers/toysat/win64/toysat.exe"
             # chemin_solver = "toysat.exe"
         elif type_solver=="cnf":
             chemin_solver = "/solvers/gophersat/win64/gophersat-1.1.6.exe"
