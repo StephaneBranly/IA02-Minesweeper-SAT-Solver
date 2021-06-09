@@ -24,7 +24,23 @@ from copy import deepcopy
 
 class dimacs(solver_template): 
     def __init__(self):
-       super().__init__()
+        self.nb_clause:int = 0
+        super().__init__()
+    
+    def modifier_nombre_clauses(self, nom_fichier, nb_nouvelle_clause, nb_var)->str:
+        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "r") # ouverture en "read"
+        lignes:List[str] = f.readlines() #sauvegarde du contenu du fichier
+        f.close()
+
+        self.nb_clause=self.nb_clause+nb_nouvelle_clause
+        lignes[1]="p cnf "+str(nb_var)+" "+str(self.nb_clause)+"\n" #modification de la ligne avec le nouveau nombre de clause
+
+        #écriture dans le fichier des lignes déjà présente et de nos nouvelles clauses
+        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w", newline='\n')
+        f.writelines(lignes)
+        f.close()
+
+        return nom_fichier
 
     # initialisation du fichier .cnf
     #TODO
@@ -84,21 +100,13 @@ class dimacs(solver_template):
 
     # ajout de chaque informatiom dans le fichier
     def ajouter_informations_dans_fichier(self,nom_fichier:str, infos: Infos, m: int, n: int) -> str:
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "r") # ouverture en "read"
-        lignes:List[str] = f.readlines() #sauvegarde du contenu du fichier
-        f.close()
-
         texte:str = ""
         for info in infos: #génération des clauses
             texte += (self.generer_contraintes_information(info,m,n))
 
-        nb_clause:int = len(texte.split('\n'))    #nombre de ligne dans le texte
-        nb_vars:int = n*m*6
-        lignes[1]="p cnf "+str(nb_vars)+" "+str(nb_clause)+"\n" #modification de la ligne avec le nouveau nombre de clause
-
-        #écriture dans le fichier des lignes déjà présente et de nos nouvelles clauses
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w", newline='\n')
-        f.writelines(lignes)
+        nb_clause_info:int = len(texte.split('\n'))    #nombre de ligne dans le texte
+        self.modifier_nombre_clauses(nom_fichier, nb_clause_info, m*n*6)
+        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "a")
         f.write(texte)
         f.close()
 
@@ -239,7 +247,7 @@ class dimacs(solver_template):
     # modification de la derniere ligne pour la remplacer avec le test demande
     #TODO
     def ajouter_test_dans_fichier(self,nom_fichier:str, contrainte:str, position: Coord, m: int, n: int) -> str:
-        f = open(f"./joueur/fichiers_opb/{nom_fichier}", "rb+") # ouverture en "read and write (bytes)"
+        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "rb+") # ouverture en "read and write (bytes)"
         f.seek(-self.taille_derniere_ligne, os.SEEK_END) # positionnement curseur a la ligne "* test ici"
         nouvelle_ligne: str = f"+1 {self.generer_variable_avec_position_et_type(position, contrainte, m, n)} = 0; * hypothese\n"
         self.taille_derniere_ligne = len(nouvelle_ligne) # sauvegarde position debut de la nouvelle ligne
@@ -252,7 +260,7 @@ class dimacs(solver_template):
     # sauvegarde de l'hypothese qui a ete testee et validee
     #TODO
     def conserver_test_dans_fichier(self,nom_fichier:str, contrainte:str, position: Coord, m: int, n: int) -> str:
-        f = open(f"./joueur/fichiers_opb/{nom_fichier}", "a") # ouverture en "append"
+        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "a") # ouverture en "append"
 
         # presence de la contrainte
         f.write(f"+1 {self.generer_variable_avec_position_et_type(position, contrainte, m, n)} = 1; * {contrainte} sur la case {position[0]},{position[1]}\n")
