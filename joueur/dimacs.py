@@ -17,6 +17,10 @@ import os
 from types_perso.types_perso import *
 from typing import List
 from itertools import combinations
+from copy import deepcopy
+
+#pour une case les variables sont: [sea land croco tigre requin découverte]
+
 
 class dimacs(solver_template): 
     def __init__(self):
@@ -116,17 +120,20 @@ class dimacs(solver_template):
             sortie+=str(-e[0])+" "+str(-e[1])+" 0\n"
         return sortie
 
+    #[sea land croco tigre requin découverte]
     def generer_variable_avec_position_et_type(self,position: Coord, type_var: str, m: int, n: int) -> int:
         decalage: int = 0
-        if type_var == "S":
+        if type_var == "merre":
+            decalage = 0
+        elif type_var == "terre":
             decalage = 1
         elif type_var == "C":
             decalage = 2
-        elif type_var == "R":
+        elif type_var == "T":
             decalage = 3
-        elif type_var == "s":
+        elif type_var == "R":
             decalage = 4
-        elif type_var == "l":
+        elif type_var == "D":
             decalage = 5
         indice_variable: int = (position[0] + position[1] * m) * 6 + 1 + decalage # positionnement grille * nombre de vars + decalage initiale + decalage selon type var
         return indice_variable
@@ -135,7 +142,7 @@ class dimacs(solver_template):
         sortie: List[int] = []
         for decalage in range(6):
             sortie.append((position[0] + position[1] * m) * 6 + 1 + decalage) # positionnement grille * nombre de vars + decalage initiale + decalage selon type var
-        return sortie
+        return sortie #[sea land croco tigre requin découverte]
 
     # les differents generateurs de clauses essentielles
     def generer_contrainte_unicite_animal(self,position: Coord, m: int, n: int) -> str:
@@ -165,7 +172,6 @@ class dimacs(solver_template):
         return clause
 
     # generateur de contraintes en fonction des informations obtenues
-    #TODO
     def generer_contraintes_information(self,info: Info, m: int, n: int) -> str:
         contraintes: str = ""
         pos: Coord = info['pos']
@@ -175,29 +181,49 @@ class dimacs(solver_template):
         # information sur le type de terrain
         if 'field' in info.keys() and not self.carte_connue[i][j][1]:
             if info['field'] == "sea":
-                contraintes += str(self.generer_variables_avec_position(pos,m,n)[0])+" 0\n"
-                contraintes += str(-self.generer_variables_avec_position(pos,m,n)[1])+" 0\n"
+                contraintes += str(self.generer_variable_avec_position_et_type(pos,'mer',m,n))+" 0\n"
+                contraintes += str(-self.generer_variable_avec_position_et_type(pos,'terre',m,n))+" 0\n"
             else:
-                contraintes += str(self.generer_variables_avec_position(pos,m,n)[1])+" 0\n"
-                contraintes += str(-self.generer_variables_avec_position(pos,m,n)[0])+" 0\n"
+                contraintes += str(self.generer_variable_avec_position_et_type(pos,'mer',m,n))+" 0\n"
+                contraintes += str(-self.generer_variable_avec_position_et_type(pos,'terre',m,n))+" 0\n"
             self.carte_connue[i][j][1] = info['field']
 
-        #TODO
         # information sur le comptage de voisins
         if 'prox_count' in info.keys():
-            vecteur: List[Coord] = [(-1,-1),(-1,0),(-1,1),
-                    (0,-1),(0,1),
-                    (1,-1),(1,0),(1,1)]
-            animaux: List[Tuple[int,str]] = [("T",0), ("S",1), ("C",2)]
-            proximite_comptage: Compte_Proximite = info['prox_count']
-            for animal in animaux:
-                contrainte_actuelle = ""
-                for vec in vecteur:
-                    if self.verifier_position_correcte((i+vec[0],j+vec[1]), m, n):
-                        contrainte_actuelle += f"+1 {self.generer_variable_avec_position_et_type((i+vec[0],j+vec[1]), animal[0], m, n)} "
-                if contrainte_actuelle:
-                    contrainte_actuelle += f"= {proximite_comptage[animal[1]]}; * voisinage animal {animal[0]} de la case ({i},{j})\n"
-                    contraintes += contrainte_actuelle
+            proximite_comptage: Compte_Proximite = {"C":info['prox_count'][2], "T":info['prox_count'][0], "R":info['prox_count'][1]}
+            for animal in ["C", "T", "R"]:
+
+                Voisin:List[int] = [] #Voisin est la liste des variables voisines liée à cet animal
+                for cpt1 in [-1, 0, 1]:
+                    for cpt2 in [-1, 0, 1]:
+                        if (cpt1==0) and (cpt2==0):
+                            pass #c'est la case elle même, ce n'est pas un voisin
+                        elif self.verifier_position_correcte((i+cpt1, j+cpt2), m, n):
+                            #si le voisin est valide alors on ajoute la variable à la liste
+                            Voisin.append(self.generer_variable_avec_position_et_type((i+cpt1, j+cpt2), animal, m, n))
+
+                for c in combinations(Voisin, proximite_comptage[animal]+1):
+                    clause:str = ""
+                    for var in c:
+                        clause+=str(-var)+" "
+                    if clause:
+                        clause+="0\n"
+                    contraintes += clause
+
+                if proximite_comptage[animal] > 0:
+                    
+                    for c in combinations(Voisin, proximite_comptage[animal]-1):
+                        liste_var:List[int]=deepcopy(Voisin)
+                        clause:str = ""
+                        for var in c:
+                            liste_var.remove(var)
+                        for var in liste_var:
+                            clause+=str(var)+" "
+                        if clause:
+                            clause+="0\n"
+                        contraintes += clause
+
+
         return contraintes
 
     # initialisation du fichier pour le prochain test
