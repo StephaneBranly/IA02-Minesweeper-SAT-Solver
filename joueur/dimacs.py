@@ -43,7 +43,7 @@ class dimacs(solver_template):
         return nom_fichier
 
     # initialisation du fichier .cnf
-    #TODO
+    #TODO a vérifier (normalement c'est ok)
     def initialiser_fichier_debut(self,infos_grille: GridInfo, nom_carte: str = "") -> str:
 
         if nom_carte:
@@ -131,15 +131,15 @@ class dimacs(solver_template):
     #[sea land croco tigre requin découverte]
     def generer_variable_avec_position_et_type(self,position: Coord, type_var: str, m: int, n: int) -> int:
         decalage: int = 0
-        if type_var == "merre":
+        if type_var == "merre" or type_var=="s":
             decalage = 0
-        elif type_var == "terre":
+        elif type_var == "terre" or type_var=="l":
             decalage = 1
         elif type_var == "C":
             decalage = 2
         elif type_var == "T":
             decalage = 3
-        elif type_var == "R":
+        elif type_var == "R" or type_var=="S":
             decalage = 4
         elif type_var == "D":
             decalage = 5
@@ -235,55 +235,77 @@ class dimacs(solver_template):
         return contraintes
 
     # initialisation du fichier pour le prochain test
-    #TODO
+    #pas nécessaire, il n'y a rien à faire ici
     def initialiser_test_dans_fichier(self,nom_fichier: str) -> str:
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "a") # ouverture en "append"
-        f.write("* test ici")
-        f.close()
-        self.taille_derniere_ligne = len("* test ici")
-
         return nom_fichier
 
     # modification de la derniere ligne pour la remplacer avec le test demande
-    #TODO
     def ajouter_test_dans_fichier(self,nom_fichier:str, contrainte:str, position: Coord, m: int, n: int) -> str:
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "rb+") # ouverture en "read and write (bytes)"
-        f.seek(-self.taille_derniere_ligne, os.SEEK_END) # positionnement curseur a la ligne "* test ici"
-        nouvelle_ligne: str = f"+1 {self.generer_variable_avec_position_et_type(position, contrainte, m, n)} = 0; * hypothese\n"
-        self.taille_derniere_ligne = len(nouvelle_ligne) # sauvegarde position debut de la nouvelle ligne
-        f.write(str.encode(nouvelle_ligne))
-        f.truncate()
+        self.modifier_nombre_clauses(nom_fichier, 1, m*n*6)
+        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "a") # ouverture en "append"
+        nouvelle_ligne: str = ""
+        if contrainte != "R":
+            nouvelle_ligne = str(-self.generer_variable_avec_position_et_type(position, contrainte, m, n))+" 0\n"
+        else:
+            nouvelle_ligne += str(self.generer_variable_avec_position_et_type(position, "T", m, n))+" "
+            nouvelle_ligne += str(self.generer_variable_avec_position_et_type(position, "R", m, n))+" "
+            nouvelle_ligne += str(self.generer_variable_avec_position_et_type(position, "C", m, n))+" 0\n"
+        f.write(nouvelle_ligne)
         f.close() 
         
         return nom_fichier
 
-    # sauvegarde de l'hypothese qui a ete testee et validee
-    #TODO
+    # sauvegarde de l'hypothese qui a ete testee et validee (on supprime la négation et on ajoute la positive)
+    #TODO a tester
     def conserver_test_dans_fichier(self,nom_fichier:str, contrainte:str, position: Coord, m: int, n: int) -> str:
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "a") # ouverture en "append"
+        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "r") # ouverture en "read"
+        lignes:List[str] = f.readlines() #sauvegarde du contenu du fichier
+        f.close()
 
-        # presence de la contrainte
-        f.write(f"+1 {self.generer_variable_avec_position_et_type(position, contrainte, m, n)} = 1; * {contrainte} sur la case {position[0]},{position[1]}\n")
-    
-        # non presence des autres contraintes sur cette case
+        dernier:int = len(lignes)-1
+        #remplacement de la négation par la positive
+        if contrainte != "R":
+            lignes[dernier] = str(self.generer_variable_avec_position_et_type(position, contrainte, m, n))+" 0\n"
+        else:
+            lignes[dernier] = str(-self.generer_variable_avec_position_et_type(position, "T", m, n))+" 0\n"
+            lignes.append(str(-self.generer_variable_avec_position_et_type(position, "S", m, n))+" 0\n")
+            lignes.append(str(-self.generer_variable_avec_position_et_type(position, "C", m, n))+" 0\n")
+            self.modifier_nombre_clauses(nom_fichier, 2, m*n*6)
+
+        #ajout des autres contrainte qui en découle (si on valide Requin on peux aussi ajouter les faits -Tigre pour aller plus vite)
         contraintes_non_possibles: List[str] = ["T","S","C","R"]
         contraintes_non_possibles.remove(contrainte)
-        non_presence_animaux: str = ""
-        for animal in contraintes_non_possibles:
-            non_presence_animaux += f"+1 {self.generer_variable_avec_position_et_type(position, animal, m, n)} "
-        non_presence_animaux += f" = 0; * les autres animaux ne sont pas sur la case {position[0]},{position[1]}\n"
-        f.write(non_presence_animaux)
-        
+        nb_clauses_ajoute:int = 0
+        for c in contraintes_non_possibles:
+            if contrainte != "R":
+                lignes.append(str(-self.generer_variable_avec_position_et_type(position, contrainte, m, n))+" 0\n")
+                nb_clauses_ajoute+=1
+            else:
+                #ici c'est pas utile d'ajouter Tigre ou Requin ou Croco si on as déjà ajouté Tigre
+                pass
+        self.modifier_nombre_clauses(nom_fichier, nb_clauses_ajoute, m*n*6)
+
+        #écriture dans le fichier des lignes créer
+        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w", newline='\n')
+        f.writelines(lignes)
         f.close()
 
         return nom_fichier
 
     # suppression de la derniere ligne de test
-    #TODO
+    #TODO a tester
     def supprimer_dernier_test_dans_fichier(self,nom_fichier: str) -> str:
-        f = open(f"./joueur/fichiers_opb/{nom_fichier}", "rb+") # ouverture en "read and write (bytes)"
-        f.seek(-self.taille_derniere_ligne, os.SEEK_END) 
-        f.truncate()
-        f.close() 
+        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "r") # ouverture en "read"
+        lignes:List[str] = f.readlines() #sauvegarde du contenu du fichier
+        f.close()
+
+        nb_var:int = int(lignes[1].split(' ')[2])
+        dernier:int = len(lignes)-1
+        lignes[dernier]=None
+        self.modifier_nombre_clauses(nom_fichier, -1, nb_var)
+
+        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w") # ouverture en "write"
+        f.write(lignes) #sauvegarde du contenu du fichier
+        f.close()
         
         return nom_fichier
