@@ -39,6 +39,7 @@ class dimacs(solver_template):
         f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w", newline='\n')
         f.writelines(lignes)
         f.close()
+        #print(self.nb_clause, nb_nouvelle_clause)
         #wait=input("modifier nombre clauses")
         return nom_fichier
 
@@ -105,11 +106,11 @@ class dimacs(solver_template):
             texte += (self.generer_contraintes_information(info,m,n))
 
         nb_clause_info:int = len(texte.split('\n'))    #nombre de ligne dans le texte
-        self.modifier_nombre_clauses(nom_fichier, nb_clause_info, m*n*6)
         f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "a")
         f.write(texte)
         wait=input("ajouter info")
         f.close()
+        self.modifier_nombre_clauses(nom_fichier, nb_clause_info, m*n*6)
 
         return nom_fichier
 
@@ -264,20 +265,20 @@ class dimacs(solver_template):
         f.close()
 
         dernier:int = len(lignes)-1
+        nb_clauses_ajoute:int = 0
         #remplacement de la négation par la positive
         if contrainte != "R":
             lignes.append(str(self.generer_variable_avec_position_et_type(position, contrainte, m, n))+" 0\n")
-            self.modifier_nombre_clauses(nom_fichier, 1, m*n*6)
+            nb_clauses_ajoute+=1
         else:
             lignes.append (str(-self.generer_variable_avec_position_et_type(position, "T", m, n))+" 0\n")
             lignes.append(str(-self.generer_variable_avec_position_et_type(position, "S", m, n))+" 0\n")
             lignes.append(str(-self.generer_variable_avec_position_et_type(position, "C", m, n))+" 0\n")
-            self.modifier_nombre_clauses(nom_fichier, 3, m*n*6)
+            nb_clauses_ajoute+=3
 
         #ajout des autres contrainte qui en découle (si on valide Requin on peux aussi ajouter les faits -Tigre pour aller plus vite)
         contraintes_non_possibles: List[str] = ["T","S","C","R"]
         contraintes_non_possibles.remove(contrainte)
-        nb_clauses_ajoute:int = 0
         for c in contraintes_non_possibles:
             if contrainte != "R":
                 lignes.append(str(-self.generer_variable_avec_position_et_type(position, c, m, n))+" 0\n")
@@ -285,12 +286,12 @@ class dimacs(solver_template):
             else:
                 #ici c'est pas utile d'ajouter Tigre ou Requin ou Croco si on as déjà ajouté Tigre
                 pass
-        self.modifier_nombre_clauses(nom_fichier, nb_clauses_ajoute, m*n*6)
 
         #écriture dans le fichier des lignes créer
         f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w", newline='\n')
         f.writelines(lignes)
         f.close()
+        self.modifier_nombre_clauses(nom_fichier, nb_clauses_ajoute, m*n*6)
         wait=input("conserver test dans fichier")
 
         return nom_fichier
@@ -307,10 +308,10 @@ class dimacs(solver_template):
         nouveau_fichier:List[str]=[]
         for l in range(dernier):
             nouveau_fichier.append(lignes[l])
-        self.modifier_nombre_clauses(nom_fichier, -1, nb_var)
 
         f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w", newline='\n') # ouverture en "write"
         f.writelines(nouveau_fichier) #sauvegarde du contenu du fichier
         f.close()
+        self.modifier_nombre_clauses(nom_fichier, -1, nb_var)
         wait=input("supprimer dernier test dans fichier")
         return nom_fichier
