@@ -1,3 +1,1 @@
-#0	discover(0,0)
-#1	discover(1,1)
-#2	discover(2,2)
+#0	discover(2,2)

@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/10 19:09:41 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 19:42:13 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -66,11 +66,11 @@ class dimacs(solver_template):
         texte:str = ""
 
         # ajout des clauses de comptage
-        #texte+=(self.generer_clause_nb_type(infos_grille["tiger_count"],"T",m,n))
-        #texte+=(self.generer_clause_nb_type(infos_grille["shark_count"],"S",m,n))
-        #texte+=(self.generer_clause_nb_type(infos_grille["croco_count"],"C",m,n))
-        #texte+=(self.generer_clause_nb_type(infos_grille["sea_count"],"s",m,n))
-        #texte+=(self.generer_clause_nb_type(infos_grille["land_count"],"l",m,n))
+        # texte+=(self.generer_clause_nb_type(infos_grille["tiger_count"],"T",m,n))
+        # texte+=(self.generer_clause_nb_type(infos_grille["shark_count"],"S",m,n))
+        # texte+=(self.generer_clause_nb_type(infos_grille["croco_count"],"C",m,n))
+        # texte+=(self.generer_clause_nb_type(infos_grille["sea_count"],"s",m,n))
+        # texte+=(self.generer_clause_nb_type(infos_grille["land_count"],"l",m,n))
 
         # initilisation des comptages
         self.comptage_animaux_carte_total = [infos_grille["tiger_count"],infos_grille["shark_count"],infos_grille["croco_count"]]
@@ -235,7 +235,7 @@ class dimacs(solver_template):
     # initialisation du fichier pour le prochain test
     def initialiser_test_dans_fichier(self,nom_fichier: str) -> str:
         f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "a", newline='\n')
-        f.write('\n')
+        f.write('c here test')
         f.close()
         self.modifier_nombre_clauses(nom_fichier, 1)
         return nom_fichier

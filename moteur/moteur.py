@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/06 17:37:00 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 19:43:35 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -36,17 +36,17 @@ def sauvegarder_historique(nom_fichier: str) -> bool:
             f.write(f"#{compteur}\t{action}\n")
             compteur += 1
         f.close()
-        historique = []
         return True
     except:
         return False
 
 def lecteur_de_map(chemin_fichier: str) -> Tuple[GridInfo,Grid]:
+    global historique
     try:
         with open(chemin_fichier) as fichier:
             info_carte: Dict = dict()
             carte: Grid = list(list(dict()))
-            
+            historique = []
             numero_ligne: int = -1
 
             for ligne in fichier:
@@ -105,7 +105,7 @@ def verifier_position_correcte(position: Coord) -> bool:
 # Dans tous les cas, le type de terrain de la case découverte est donné.
 def discover(i: int, j:int) -> Tuple[Status, Msg, Infos]:
     global carte_courante, info_carte_courante
-    historique.append(f"discover({i},{j})")
+    print(f"discover({i},{j})")
     if(carte_courante[i][j]['animal']!=None):
         return "KO", "", []
     else:
@@ -128,7 +128,7 @@ def discover(i: int, j:int) -> Tuple[Status, Msg, Infos]:
 # Sinon, le type de terrain de la case (i,j) est toujours donné.
 def guess(i: int, j:int, animal: str) -> Tuple[Status, Msg, Infos]:
     global carte_courante, info_carte_courante, historique
-    historique.append(f"guess({i},{j},'{animal}')")
+    print(f"guess({i},{j},'{animal}')")
     if(carte_courante[i][j]['animal']!=animal):
         return "KO", "", []
 
