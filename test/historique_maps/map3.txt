@@ -3,4 +3,5 @@
 #2	discover(7,8)
 #3	discover(7,7)
 #4	discover(7,6)
-#5	discover(7,5)
+#5	guess(7,5,'S')
+#6	discover(6,5)
