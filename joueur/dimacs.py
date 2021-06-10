@@ -133,7 +133,7 @@ class dimacs(solver_template):
     #[sea land croco tigre requin découverte]
     def generer_variable_avec_position_et_type(self,position: Coord, type_var: str, m: int, n: int) -> int:
         decalage: int = 0
-        if type_var == "merre" or type_var=="s":
+        if type_var == "mer" or type_var=="s":
             decalage = 0
         elif type_var == "terre" or type_var=="l":
             decalage = 1
