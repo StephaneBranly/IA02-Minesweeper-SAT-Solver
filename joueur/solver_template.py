@@ -80,7 +80,7 @@ class solver_template():
 
     # verification si le probleme est satisfiable
     def verifier_sat_fichier(self,nom_fichier: str, chemin_solver: str) -> bool:
-        output = os.popen(f"{chemin_solver} --pb ./joueur/fichiers_opb/{nom_fichier}").read()
+        output = os.popen(f"{chemin_solver} ./joueur/fichiers_cnf/{nom_fichier}").read()
         return "s SATISFIABLE" in output 
 
     

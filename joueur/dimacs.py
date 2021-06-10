@@ -43,7 +43,6 @@ class dimacs(solver_template):
         return nom_fichier
 
     # initialisation du fichier .cnf
-    #TODO a vérifier (normalement c'est ok)
     def initialiser_fichier_debut(self,infos_grille: GridInfo, nom_carte: str = "") -> str:
 
         if nom_carte:
@@ -90,12 +89,13 @@ class dimacs(solver_template):
 
         #écriture dans le fichier
         tableau_ligne=texte.split('\n')
-        nb_clause:int = len(tableau_ligne)-2    #nombre de ligne dans le texte-2 (1 commentaire 1 ligne p 1 ligne finale avec juste\n)
+        nb_clause:int = len(tableau_ligne)-1    #nombre de ligne dans le texte-2 (1 commentaire 1 ligne p 1 ligne finale avec juste\n)
         nb_vars:int = n*m*6
         f.write("p cnf "+str(nb_vars)+" "+str(nb_clause)+"\n")
         f.write(texte)
 
         f.close()
+
         return nom_fichier
 
     # ajout de chaque informatiom dans le fichier
@@ -242,7 +242,7 @@ class dimacs(solver_template):
     # modification de la derniere ligne pour la remplacer avec le test demande
     def ajouter_test_dans_fichier(self,nom_fichier:str, contrainte:str, position: Coord, m: int, n: int) -> str:
         self.modifier_nombre_clauses(nom_fichier, 1, m*n*6)
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "a") # ouverture en "append"
+        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "a", newline='\n') # ouverture en "append"
         nouvelle_ligne: str = ""
         if contrainte != "R":
             nouvelle_ligne = str(-self.generer_variable_avec_position_et_type(position, contrainte, m, n))+" 0\n"
@@ -306,7 +306,7 @@ class dimacs(solver_template):
             nouveau_fichier.append(lignes[l])
         self.modifier_nombre_clauses(nom_fichier, -1, nb_var)
 
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w") # ouverture en "write"
+        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w", newline='\n') # ouverture en "write"
         f.writelines(nouveau_fichier) #sauvegarde du contenu du fichier
         f.close()
         
