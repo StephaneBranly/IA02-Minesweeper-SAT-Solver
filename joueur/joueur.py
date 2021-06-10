@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/10 21:01:06 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 22:27:17 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -81,7 +81,9 @@ def jouer(info_carte_courante: GridInfo, nom_carte: str, chemin_solver:str, type
             for info in infos:
                 if info['pos'] not in cases_a_tester and not solver.verifier_si_case_exploree(info['pos']):
                     cases_a_tester.insert(0,info['pos']) # on indique les nouvelles positions a analyser
-
+        else:
+            print(f"{couleurs.KO}Pas de mouvement trouve{couleurs.FIN}")
+            return "KO"
         if st == "KO" or st == "GG":
             return st
     return "KO"    

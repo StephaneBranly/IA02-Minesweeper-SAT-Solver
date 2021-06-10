@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/10 21:17:16 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 22:26:45 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -214,6 +214,7 @@ class dimacs(solver_template):
 
         # information sur le comptage de voisins
         if 'prox_count' in info.keys():
+            self.indiquer_case_exploree((i,j),"R")
             proximite_comptage: Compte_Proximite = {"C":info['prox_count'][2], "T":info['prox_count'][0], "R":info['prox_count'][1]}
             for animal in ["C", "T", "R"]:
                 Voisin:List[int] = [] #Voisin est la liste des variables voisines liée à cet animal
