@@ -266,12 +266,13 @@ class dimacs(solver_template):
         dernier:int = len(lignes)-1
         #remplacement de la négation par la positive
         if contrainte != "R":
-            lignes[dernier] = str(self.generer_variable_avec_position_et_type(position, contrainte, m, n))+" 0\n"
+            lignes.append(str(self.generer_variable_avec_position_et_type(position, contrainte, m, n))+" 0\n")
+            self.modifier_nombre_clauses(nom_fichier, 1, m*n*6)
         else:
-            lignes[dernier] = str(-self.generer_variable_avec_position_et_type(position, "T", m, n))+" 0\n"
+            lignes.append (str(-self.generer_variable_avec_position_et_type(position, "T", m, n))+" 0\n")
             lignes.append(str(-self.generer_variable_avec_position_et_type(position, "S", m, n))+" 0\n")
             lignes.append(str(-self.generer_variable_avec_position_et_type(position, "C", m, n))+" 0\n")
-            self.modifier_nombre_clauses(nom_fichier, 2, m*n*6)
+            self.modifier_nombre_clauses(nom_fichier, 3, m*n*6)
 
         #ajout des autres contrainte qui en découle (si on valide Requin on peux aussi ajouter les faits -Tigre pour aller plus vite)
         contraintes_non_possibles: List[str] = ["T","S","C","R"]
@@ -279,7 +280,7 @@ class dimacs(solver_template):
         nb_clauses_ajoute:int = 0
         for c in contraintes_non_possibles:
             if contrainte != "R":
-                lignes.append(str(-self.generer_variable_avec_position_et_type(position, contrainte, m, n))+" 0\n")
+                lignes.append(str(-self.generer_variable_avec_position_et_type(position, c, m, n))+" 0\n")
                 nb_clauses_ajoute+=1
             else:
                 #ici c'est pas utile d'ajouter Tigre ou Requin ou Croco si on as déjà ajouté Tigre
@@ -289,8 +290,8 @@ class dimacs(solver_template):
         #écriture dans le fichier des lignes créer
         f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w", newline='\n')
         f.writelines(lignes)
-        wait=input("conserver test dans fichier")
         f.close()
+        wait=input("conserver test dans fichier")
 
         return nom_fichier
 
