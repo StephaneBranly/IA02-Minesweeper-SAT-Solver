@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/10 19:43:35 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 19:56:42 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -105,7 +105,7 @@ def verifier_position_correcte(position: Coord) -> bool:
 # Dans tous les cas, le type de terrain de la case découverte est donné.
 def discover(i: int, j:int) -> Tuple[Status, Msg, Infos]:
     global carte_courante, info_carte_courante
-    print(f"discover({i},{j})")
+    historique.append(f"discover({i},{j})")
     if(carte_courante[i][j]['animal']!=None):
         return "KO", "", []
     else:
@@ -128,7 +128,7 @@ def discover(i: int, j:int) -> Tuple[Status, Msg, Infos]:
 # Sinon, le type de terrain de la case (i,j) est toujours donné.
 def guess(i: int, j:int, animal: str) -> Tuple[Status, Msg, Infos]:
     global carte_courante, info_carte_courante, historique
-    print(f"guess({i},{j},'{animal}')")
+    historique.append(f"guess({i},{j},'{animal}')")
     if(carte_courante[i][j]['animal']!=animal):
         return "KO", "", []
 

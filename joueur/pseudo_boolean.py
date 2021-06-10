@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/08 19:04:49 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 19:56:09 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -196,3 +196,8 @@ class pseudo_boolean(solver_template):
         f.close() 
         
         return nom_fichier
+
+    # verification si le probleme est satisfiable
+    def verifier_sat_fichier(self,nom_fichier: str, chemin_solver: str) -> bool:
+        output = os.popen(f"{chemin_solver} --pb ./joueur/fichiers_opb/{nom_fichier}").read()
+        return "s SATISFIABLE" in output 

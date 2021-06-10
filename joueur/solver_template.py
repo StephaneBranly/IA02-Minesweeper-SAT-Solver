@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/08 19:18:33 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 19:55:42 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -80,8 +80,7 @@ class solver_template():
 
     # verification si le probleme est satisfiable
     def verifier_sat_fichier(self,nom_fichier: str, chemin_solver: str) -> bool:
-        output = os.popen(f"{chemin_solver} ./joueur/fichiers_cnf/{nom_fichier}").read()
-        return "s SATISFIABLE" in output 
+        pass
 
     
     def verifier_si_case_exploree(self,position: Coord) -> bool:
