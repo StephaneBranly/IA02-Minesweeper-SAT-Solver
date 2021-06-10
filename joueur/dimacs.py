@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/10 20:03:56 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 20:37:49 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -53,23 +53,25 @@ class dimacs(solver_template):
         m: int = infos_grille["m"]  
         self.nb_var=m*n*6  
 
+        flatList = []
         #initialisation de la carte a vide
         self.carte_connue = []
         for i in range(m):
             rang = []
             for j in range(n):
                 rang.append([0,0])
+                flatList.append([i,j])
             self.carte_connue.append(rang)
         f.write(f"c {nom_carte}.map\n")
 
         texte:str = ""
 
         # ajout des clauses de comptage
-        # texte+=(self.generer_clause_nb_type(infos_grille["tiger_count"],"T",m,n))
-        # texte+=(self.generer_clause_nb_type(infos_grille["shark_count"],"S",m,n))
-        # texte+=(self.generer_clause_nb_type(infos_grille["croco_count"],"C",m,n))
-        # texte+=(self.generer_clause_nb_type(infos_grille["sea_count"],"s",m,n))
-        # texte+=(self.generer_clause_nb_type(infos_grille["land_count"],"l",m,n))
+        # texte+=(self.generer_clause_nb_type(infos_grille["tiger_count"],"T",m,n,flatList))
+        # texte+=(self.generer_clause_nb_type(infos_grille["shark_count"],"S",m,n,flatList))
+        # texte+=(self.generer_clause_nb_type(infos_grille["croco_count"],"C",m,n,flatList))
+        # texte+=(self.generer_clause_nb_type(infos_grille["sea_count"],"s",m,n,flatList))
+        # texte+=(self.generer_clause_nb_type(infos_grille["land_count"],"l",m,n,flatList))
 
         # initilisation des comptages
         self.comptage_animaux_carte_total = [infos_grille["tiger_count"],infos_grille["shark_count"],infos_grille["croco_count"]]
@@ -115,13 +117,24 @@ class dimacs(solver_template):
 
     # generateur clause de comptage
     #TODO    
-    def generer_clause_nb_type(self,nb_animal: int, type_var: str, m: int, n:int) -> str:
-        clause: str = ""
-        for i in range(m):
-            for j in range(n):
-                clause += f"+1 {self.generer_variable_avec_position_et_type((i,j), type_var, m, n)} " # somme de chaque variable
-        clause += f"= {nb_animal}; * comptage total de {type_var}\n" # = comptage total pour ce type
-        return clause
+    def generer_clause_nb_type(self,nb_animal: int, type_var: str, m: int, n:int, flatList) -> str:
+        contraintes = ""
+        for c in combinations(flatList, m*n-nb_animal+1):
+            clause:str = ""
+            for var in c:
+                clause+= f"{self.generer_variable_avec_position_et_type(var,type_var,m,n)} "
+            if clause:
+                clause+= "0\n"
+            contraintes += clause
+        
+        for c in combinations(flatList, nb_animal+1):
+            clause:str = ""
+            for var in c:
+                clause+= f"-{self.generer_variable_avec_position_et_type(var,type_var,m,n)} "
+            if clause:
+                clause+= "0\n"
+            contraintes += clause        
+        return contraintes
 
     def au_plus_un(self, vars:List[int]) -> str:
         sortie:str = ""
