@@ -194,8 +194,8 @@ class dimacs(solver_template):
                 contraintes += str(self.generer_variable_avec_position_et_type(pos,'mer',m,n))+" 0\n"
                 contraintes += str(-self.generer_variable_avec_position_et_type(pos,'terre',m,n))+" 0\n"
             else:
-                contraintes += str(self.generer_variable_avec_position_et_type(pos,'mer',m,n))+" 0\n"
-                contraintes += str(-self.generer_variable_avec_position_et_type(pos,'terre',m,n))+" 0\n"
+                contraintes += str(-self.generer_variable_avec_position_et_type(pos,'mer',m,n))+" 0\n"
+                contraintes += str(self.generer_variable_avec_position_et_type(pos,'terre',m,n))+" 0\n"
             self.carte_connue[i][j][1] = info['field']
 
         # information sur le comptage de voisins
