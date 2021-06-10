@@ -66,11 +66,11 @@ class dimacs(solver_template):
         texte:str = ""
 
         # ajout des clauses de comptage
-        texte+=(self.generer_clause_nb_type(infos_grille["tiger_count"],"T",m,n))
-        texte+=(self.generer_clause_nb_type(infos_grille["shark_count"],"S",m,n))
-        texte+=(self.generer_clause_nb_type(infos_grille["croco_count"],"C",m,n))
-        texte+=(self.generer_clause_nb_type(infos_grille["sea_count"],"s",m,n))
-        texte+=(self.generer_clause_nb_type(infos_grille["land_count"],"l",m,n))
+        #texte+=(self.generer_clause_nb_type(infos_grille["tiger_count"],"T",m,n))
+        #texte+=(self.generer_clause_nb_type(infos_grille["shark_count"],"S",m,n))
+        #texte+=(self.generer_clause_nb_type(infos_grille["croco_count"],"C",m,n))
+        #texte+=(self.generer_clause_nb_type(infos_grille["sea_count"],"s",m,n))
+        #texte+=(self.generer_clause_nb_type(infos_grille["land_count"],"l",m,n))
 
         # initilisation des comptages
         self.comptage_animaux_carte_total = [infos_grille["tiger_count"],infos_grille["shark_count"],infos_grille["croco_count"]]
@@ -122,7 +122,7 @@ class dimacs(solver_template):
         clause += f"= {nb_animal}; * comptage total de {type_var}\n" # = comptage total pour ce type
         return clause
 
-    def au_plus_un(vars:List[int]) -> str:
+    def au_plus_un(self, vars:List[int]) -> str:
         sortie:str = ""
         for e in combinations(vars, 2):
             sortie+=str(-e[0])+" "+str(-e[1])+" 0\n"
@@ -301,11 +301,13 @@ class dimacs(solver_template):
 
         nb_var:int = int(lignes[1].split(' ')[2])
         dernier:int = len(lignes)-1
-        lignes[dernier]=None
+        nouveau_fichier:List[str]=[]
+        for l in range(dernier-1):
+            nouveau_fichier.append(lignes[l])
         self.modifier_nombre_clauses(nom_fichier, -1, nb_var)
 
         f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w") # ouverture en "write"
-        f.write(lignes) #sauvegarde du contenu du fichier
+        f.writelines(nouveau_fichier) #sauvegarde du contenu du fichier
         f.close()
         
         return nom_fichier

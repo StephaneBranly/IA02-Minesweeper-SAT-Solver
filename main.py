@@ -54,7 +54,6 @@ def main(argv):
     elif(nom_os=='windows'):
         if type_solver=="opb":
             chemin_solver = "/solvers/toysat/win64/toysat.exe"
-            # chemin_solver = "toysat.exe"
         elif type_solver=="cnf":
             chemin_solver = "/solvers/gophersat/win64/gophersat-1.1.6.exe"
     elif(nom_os=='macos'):
@@ -63,7 +62,7 @@ def main(argv):
         elif type_solver=="cnf":
             chemin_solver = "/solvers/gophersat/macos64/gophersat-1.1.6"
     if lancer_test:
-        test(os.getcwd()+chemin_solver)
+        test(os.getcwd()+chemin_solver, type_solver)
         sys.exit(0)
 
     aide()
