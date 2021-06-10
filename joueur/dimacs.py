@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/10 20:38:39 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 21:01:19 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -27,8 +27,8 @@ class dimacs(solver_template):
         self.nb_var:int=0
         super().__init__()
     
-    def modifier_nombre_clauses(self, nom_fichier:str, nb_nouvelle_clause:int)->str:
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "r") # ouverture en "read"
+    def modifier_nombre_clauses(self, nb_nouvelle_clause:int)->str:
+        f = open(f"./joueur/fichiers_cnf/{self.nom_fichier}", "r") # ouverture en "read"
         lignes:List[str] = f.readlines() #sauvegarde du contenu du fichier
         f.close()
 
@@ -36,29 +36,28 @@ class dimacs(solver_template):
         lignes[1]=f"p cnf {self.nb_var} {self.nb_clause}\n" #modification de la ligne avec le nouveau nombre de clause
 
         #écriture dans le fichier des lignes déjà présente et de nos nouvelles clauses
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w", newline='\n')
+        f = open(f"./joueur/fichiers_cnf/{self.nom_fichier}", "w", newline='\n')
         f.writelines(lignes)
         f.close()
-        return nom_fichier
+        return self.nom_fichier
 
     # initialisation du fichier .cnf
     def initialiser_fichier_debut(self,infos_grille: GridInfo, nom_carte: str = "") -> str:
-
         if nom_carte:
-            nom_fichier: str = f"{nom_carte}.cnf"
+            self.nom_fichier: str = f"{nom_carte}.cnf"
         else:
-            nom_fichier: str = f"f.cnf"
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w", newline='\n') # ouverture en "write", ecrase l'ancien si existant
-        n: int = infos_grille["n"]
-        m: int = infos_grille["m"]  
-        self.nb_var=m*n*6  
+            self.nom_fichier: str = f"f.cnf"
+        f = open(f"./joueur/fichiers_cnf/{self.nom_fichier}", "w", newline='\n') # ouverture en "write", ecrase l'ancien si existant
+        self.n: int = infos_grille["n"]
+        self.m: int = infos_grille["m"]  
+        self.nb_var=self.m*self.n*6  
 
         flatList = []
         #initialisation de la carte a vide
         self.carte_connue = []
-        for i in range(m):
+        for i in range(self.m):
             rang = []
-            for j in range(n):
+            for j in range(self.n):
                 rang.append([0,0])
                 flatList.append([i,j])
             self.carte_connue.append(rang)
@@ -67,11 +66,11 @@ class dimacs(solver_template):
         texte:str = ""
 
         # ajout des clauses de comptage
-        # texte+=(self.generer_clause_nb_type(infos_grille["tiger_count"],"T",m,n,flatList))
-        # texte+=(self.generer_clause_nb_type(infos_grille["shark_count"],"S",m,n,flatList))
-        # texte+=(self.generer_clause_nb_type(infos_grille["croco_count"],"C",m,n,flatList))
-        # texte+=(self.generer_clause_nb_type(infos_grille["sea_count"],"s",m,n,flatList))
-        # texte+=(self.generer_clause_nb_type(infos_grille["land_count"],"l",m,n,flatList))
+        # texte+=(self.generer_clause_nb_type(infos_grille["tiger_count"],"T",flatList))
+        # texte+=(self.generer_clause_nb_type(infos_grille["shark_count"],"S",flatList))
+        # texte+=(self.generer_clause_nb_type(infos_grille["croco_count"],"C",flatList))
+        # texte+=(self.generer_clause_nb_type(infos_grille["sea_count"],"s",flatList))
+        # texte+=(self.generer_clause_nb_type(infos_grille["land_count"],"l",flatList))
 
         # initilisation des comptages
         self.comptage_animaux_carte_total = [infos_grille["tiger_count"],infos_grille["shark_count"],infos_grille["croco_count"]]
@@ -80,48 +79,47 @@ class dimacs(solver_template):
         # ajout des clauses pour chaque case (animal, terrain, animal -> terrain)
         for i in range(infos_grille["m"]):
             for j in range(infos_grille['n']):
-                texte+=(self.generer_contrainte_unicite_animal((i,j),m,n))
-                texte+=(self.generer_contrainte_unicite_terrain((i,j),m,n))
-                texte+=(self.generer_implication_animal_terrain((i,j),m,n))
+                texte+=(self.generer_contrainte_unicite_animal((i,j)))
+                texte+=(self.generer_contrainte_unicite_terrain((i,j)))
+                texte+=(self.generer_implication_animal_terrain((i,j)))
 
         # ajout de l'information sur la case de debut
-        texte+=(self.generer_information_depart(infos_grille['start'],m,n))
+        texte+=(self.generer_information_depart(infos_grille['start']))
 
         # TODO, voir pour ajouter informations obtenues au debut de la map
 
         #écriture dans le fichier
         tableau_ligne=texte.split('\n')
         self.nb_clause:int = len(tableau_ligne)-1    #nombre de ligne dans le texte-2 (1 commentaire 1 ligne p 1 ligne finale avec juste\n)
-        nb_vars:int = n*m*6
-        f.write(f"p cnf {nb_vars} {self.nb_clause}\n")
+        f.write(f"p cnf {self.nb_var} {self.nb_clause}\n")
         f.write(texte)
         
         f.close()
         #wait=input("initialisation")
-        return nom_fichier
+        return self.nom_fichier
 
     # ajout de chaque informatiom dans le fichier
-    def ajouter_informations_dans_fichier(self,nom_fichier:str, infos: Infos, m: int, n: int) -> str:
+    def ajouter_informations_dans_fichier(self, infos: Infos) -> str:
         texte:str = ""
         for info in infos: #génération des clauses
-            texte += (self.generer_contraintes_information(info,m,n))
+            texte += (self.generer_contraintes_information(info))
 
         nb_clause_info:int = len(texte.split('\n'))-1    #nombre de ligne dans le texte
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "a")
+        f = open(f"./joueur/fichiers_cnf/{self.nom_fichier}", "a")
         f.write(texte)
         f.close()
-        self.modifier_nombre_clauses(nom_fichier, nb_clause_info)
+        self.modifier_nombre_clauses(nb_clause_info)
 
-        return nom_fichier
+        return self.nom_fichier
 
     # generateur clause de comptage
     #TODO    
-    def generer_clause_nb_type(self,nb_animal: int, type_var: str, m: int, n:int, flatList) -> str:
+    def generer_clause_nb_type(self,nb_animal: int, type_var: str, flatList) -> str:
         contraintes = ""
-        for c in combinations(flatList, m*n-nb_animal+1):
+        for c in combinations(flatList, self.m*self.n-nb_animal+1):
             clause:str = ""
             for var in c:
-                clause+= f"{self.generer_variable_avec_position_et_type(var,type_var,m,n)} "
+                clause+= f"{self.generer_variable_avec_position_et_type(var,type_var)} "
             if clause:
                 clause+= "0\n"
             contraintes += clause
@@ -129,7 +127,7 @@ class dimacs(solver_template):
         for c in combinations(flatList, nb_animal+1):
             clause:str = ""
             for var in c:
-                clause+= f"-{self.generer_variable_avec_position_et_type(var,type_var,m,n)} "
+                clause+= f"-{self.generer_variable_avec_position_et_type(var,type_var)} "
             if clause:
                 clause+= "0\n"
             contraintes += clause        
@@ -142,7 +140,7 @@ class dimacs(solver_template):
         return sortie
 
     #[sea land croco tigre requin découverte]
-    def generer_variable_avec_position_et_type(self,position: Coord, type_var: str, m: int, n: int) -> int:
+    def generer_variable_avec_position_et_type(self,position: Coord, type_var: str) -> int:
         decalage: int = 0
         if type_var == "mer" or type_var=="s":
             decalage = 0
@@ -156,44 +154,44 @@ class dimacs(solver_template):
             decalage = 4
         elif type_var == "D":
             decalage = 5
-        indice_variable: int = (position[0] + position[1] * m) * 6 + 1 + decalage # positionnement grille * nombre de vars + decalage initiale + decalage selon type var
+        indice_variable: int = (position[0] + position[1] * self.m) * 6 + 1 + decalage # positionnement grille * nombre de vars + decalage initiale + decalage selon type var
         return indice_variable
 
-    def generer_variables_avec_position(self,position: Coord, m: int, n: int) -> List[int]:
+    def generer_variables_avec_position(self,position: Coord) -> List[int]:
         sortie: List[int] = []
         for decalage in range(6):
-            sortie.append((position[0] + position[1] * m) * 6 + 1 + decalage) # positionnement grille * nombre de vars + decalage initiale + decalage selon type var
+            sortie.append((position[0] + position[1] * self.m) * 6 + 1 + decalage) # positionnement grille * nombre de vars + decalage initiale + decalage selon type var
         return sortie #[sea land croco tigre requin découverte]
 
     # les differents generateurs de clauses essentielles
-    def generer_contrainte_unicite_animal(self,position: Coord, m: int, n: int) -> str:
-        var_ij:List[int] = self.generer_variables_avec_position(position, m, n) #recupere toute les variables liées à la case position
+    def generer_contrainte_unicite_animal(self,position: Coord) -> str:
+        var_ij:List[int] = self.generer_variables_avec_position(position) #recupere toute les variables liées à la case position
         var:list[int] = [var_ij[2], var_ij[3], var_ij[4]] #recupère juste les variables liées aux animaux présents sur position
         bc:str = str(self.au_plus_un(var))
         return bc
 
-    def generer_contrainte_unicite_terrain(self,position: Coord, m: int, n: int) -> str:
-        var_ij:List[int] = self.generer_variables_avec_position(position, m, n) #recupere toute les variables liées à la case (i,j)
+    def generer_contrainte_unicite_terrain(self,position: Coord) -> str:
+        var_ij:List[int] = self.generer_variables_avec_position(position) #recupere toute les variables liées à la case (i,j)
         var:list[int] = [var_ij[0], var_ij[1]] #recupère juste les variables liées aux terrin présents sur (i,j)
         bc:str = str(self.au_plus_un(var))
         return bc
 
-    def generer_implication_animal_terrain(self,position: Coord, m: int, n: int) -> str:
+    def generer_implication_animal_terrain(self,position: Coord) -> str:
         bc:str = ""
-        vars:List[int] = self.generer_variables_avec_position(position, m, n) #recupere toute les variables liées à la case (i,j)                
+        vars:List[int] = self.generer_variables_avec_position(position) #recupere toute les variables liées à la case (i,j)                
         clause:str= f"-{vars[1]} -{vars[4]} 0\n-{vars[0]} -{vars[3]} 0\n-{vars[4]} {vars[0]} 0\n-{vars[3]} {vars[1]} 0\n"
         bc+=clause
         return bc
 
     #génère l'info comme quoi la case de départ est vide de tout animal
-    def generer_information_depart(self,position: Coord, m: int, n:int) -> str:
+    def generer_information_depart(self,position: Coord) -> str:
         clause:str = ""
         for i in range(3):
-            clause+= f"-{self.generer_variables_avec_position(position,m,n)[i+2]} 0\n"
+            clause+= f"-{self.generer_variables_avec_position(position)[i+2]} 0\n"
         return clause
 
     # generateur de contraintes en fonction des informations obtenues
-    def generer_contraintes_information(self,info: Info, m: int, n: int) -> str:
+    def generer_contraintes_information(self,info: Info) -> str:
         contraintes: str = ""
         pos: Coord = info['pos']
         i: int = pos[0]
@@ -202,11 +200,11 @@ class dimacs(solver_template):
         # information sur le type de terrain
         if 'field' in info.keys() and not self.carte_connue[i][j][1]:
             if info['field'] == "sea":
-                contraintes += f"{self.generer_variable_avec_position_et_type(pos,'s',m,n)} 0\n"
-                contraintes += f"-{self.generer_variable_avec_position_et_type(pos,'l',m,n)} 0\n"
+                contraintes += f"{self.generer_variable_avec_position_et_type(pos,'s')} 0\n"
+                contraintes += f"-{self.generer_variable_avec_position_et_type(pos,'l')} 0\n"
             else:
-                contraintes += f"-{self.generer_variable_avec_position_et_type(pos,'s',m,n)} 0\n"
-                contraintes += f"{self.generer_variable_avec_position_et_type(pos,'l',m,n)} 0\n"
+                contraintes += f"-{self.generer_variable_avec_position_et_type(pos,'s')} 0\n"
+                contraintes += f"{self.generer_variable_avec_position_et_type(pos,'l')} 0\n"
             self.carte_connue[i][j][1] = info['field']
 
         # information sur le comptage de voisins
@@ -219,9 +217,9 @@ class dimacs(solver_template):
                     for cpt2 in [-1, 0, 1]:
                         if (cpt1==0) and (cpt2==0):
                             pass #c'est la case elle même, ce n'est pas un voisin
-                        elif self.verifier_position_correcte((i+cpt1, j+cpt2), m, n):
+                        elif self.verifier_position_correcte((i+cpt1, j+cpt2)):
                             #si le voisin est valide alors on ajoute la variable à la liste
-                            Voisin.append(self.generer_variable_avec_position_et_type((i+cpt1, j+cpt2), animal, m, n))
+                            Voisin.append(self.generer_variable_avec_position_et_type((i+cpt1, j+cpt2), animal))
 
                 for c in combinations(Voisin, len(Voisin)-proximite_comptage[animal]+1):
                     clause:str = ""
@@ -238,57 +236,53 @@ class dimacs(solver_template):
                     if clause:
                         clause+= "0\n"
                     contraintes += clause                    
-
-            # print(f"\n\nvoisins = \n{Voisin} \nprox = \n{proximite_comptage}\n\ncontraintes = \n{contraintes}")
-            # wait=input()
         return contraintes
 
     # initialisation du fichier pour le prochain test
-    def initialiser_test_dans_fichier(self,nom_fichier: str) -> str:
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "a", newline='\n')
+    def initialiser_test_dans_fichier(self) -> str:
+        f = open(f"./joueur/fichiers_cnf/{self.nom_fichier}", "a", newline='\n')
         f.write('c here test')
         f.close()
-        self.modifier_nombre_clauses(nom_fichier, 1)
-        return nom_fichier
+        self.modifier_nombre_clauses(1)
+        return self.nom_fichier
 
     # modification de la derniere ligne pour la remplacer avec le test demande
-    def ajouter_test_dans_fichier(self,nom_fichier:str, contrainte:str, position: Coord, m: int, n: int) -> str:
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "r", newline='\n') # ouverture en "read"
+    def ajouter_test_dans_fichier(self, contrainte:str, position: Coord) -> str:
+        f = open(f"./joueur/fichiers_cnf/{self.nom_fichier}", "r", newline='\n') # ouverture en "read"
         lignes:List[str] = f.readlines()
         f.close()
 
         dernier:int = len(lignes)-1
         nouvelle_ligne: str = ""
         if contrainte != "R":
-            nouvelle_ligne = f"-{self.generer_variable_avec_position_et_type(position, contrainte, m, n)} 0\n"
+            nouvelle_ligne = f"-{self.generer_variable_avec_position_et_type(position, contrainte)} 0\n"
         else:
-            nouvelle_ligne += f"{self.generer_variable_avec_position_et_type(position, 'T', m, n)} "
-            nouvelle_ligne += f"{self.generer_variable_avec_position_et_type(position, 'S', m, n)} "
-            nouvelle_ligne += f"{self.generer_variable_avec_position_et_type(position, 'C', m, n)} 0\n"
+            nouvelle_ligne += f"{self.generer_variable_avec_position_et_type(position, 'T')} "
+            nouvelle_ligne += f"{self.generer_variable_avec_position_et_type(position, 'S')} "
+            nouvelle_ligne += f"{self.generer_variable_avec_position_et_type(position, 'C')} 0\n"
         lignes[dernier]=nouvelle_ligne
         
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w", newline='\n') # ouverture en "write"
+        f = open(f"./joueur/fichiers_cnf/{self.nom_fichier}", "w", newline='\n') # ouverture en "write"
         f.writelines(lignes)
         f.close() 
-        #wait=input("ajouter test dans fichier")
-        return nom_fichier
+        return self.nom_fichier
 
     # sauvegarde de l'hypothese qui a ete testee et validee (on supprime la négation et on ajoute la positive)
     #TODO a tester
-    def conserver_test_dans_fichier(self,nom_fichier:str, contrainte:str, position: Coord, m: int, n: int) -> str:
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "r") # ouverture en "read"
+    def conserver_test_dans_fichier(self, contrainte:str, position: Coord) -> str:
+        f = open(f"./joueur/fichiers_cnf/{self.nom_fichier}", "r") # ouverture en "read"
         lignes:List[str] = f.readlines() #sauvegarde du contenu du fichier
         f.close()
 
         nb_clauses_ajoute:int = 0
         #remplacement de la négation par la positive
         if contrainte != "R":
-            lignes.append(f"{self.generer_variable_avec_position_et_type(position, contrainte, m, n)} 0\n")
+            lignes.append(f"{self.generer_variable_avec_position_et_type(position, contrainte)} 0\n")
             nb_clauses_ajoute+=1
         else:
-            lignes.append(f"-{self.generer_variable_avec_position_et_type(position, 'T', m, n)} 0\n")
-            lignes.append(f"-{self.generer_variable_avec_position_et_type(position, 'S', m, n)} 0\n")
-            lignes.append(f"-{self.generer_variable_avec_position_et_type(position, 'C', m, n)} 0\n")
+            lignes.append(f"-{self.generer_variable_avec_position_et_type(position, 'T')} 0\n")
+            lignes.append(f"-{self.generer_variable_avec_position_et_type(position, 'S')} 0\n")
+            lignes.append(f"-{self.generer_variable_avec_position_et_type(position, 'C')} 0\n")
             nb_clauses_ajoute+=3
 
         #ajout des autres contrainte qui en découle (si on valide Requin on peux aussi ajouter les faits -Tigre pour aller plus vite)
@@ -296,25 +290,25 @@ class dimacs(solver_template):
         contraintes_non_possibles.remove(contrainte)
         for c in contraintes_non_possibles:
             if c != "R":
-                lignes.append(str(-self.generer_variable_avec_position_et_type(position, c, m, n))+" 0\n")
+                lignes.append(str(-self.generer_variable_avec_position_et_type(position, c))+" 0\n")
                 nb_clauses_ajoute+=1
             else:
                 #ici c'est pas utile d'ajouter Tigre ou Requin ou Croco si on as déjà ajouté Tigre
                 pass
 
         #écriture dans le fichier des lignes créer
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w", newline='\n')
+        f = open(f"./joueur/fichiers_cnf/{self.nom_fichier}", "w", newline='\n')
         f.writelines(lignes)
         f.close()
-        self.modifier_nombre_clauses(nom_fichier, nb_clauses_ajoute)
+        self.modifier_nombre_clauses(nb_clauses_ajoute)
         #wait=input("conserver test dans fichier")
 
-        return nom_fichier
+        return self.nom_fichier
 
     # suppression de la derniere ligne de test
     #TODO a tester
-    def supprimer_dernier_test_dans_fichier(self,nom_fichier: str) -> str:
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "r") # ouverture en "read"
+    def supprimer_dernier_test_dans_fichier(self) -> str:
+        f = open(f"./joueur/fichiers_cnf/{self.nom_fichier}", "r") # ouverture en "read"
         lignes:List[str] = f.readlines() #sauvegarde du contenu du fichier
         f.close()
 
@@ -323,14 +317,14 @@ class dimacs(solver_template):
         for l in range(dernier):
             nouveau_fichier.append(lignes[l])
 
-        f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "w", newline='\n') # ouverture en "write"
+        f = open(f"./joueur/fichiers_cnf/{self.nom_fichier}", "w", newline='\n') # ouverture en "write"
         f.writelines(nouveau_fichier) #sauvegarde du contenu du fichier
         f.close()
-        self.modifier_nombre_clauses(nom_fichier, -1)
+        self.modifier_nombre_clauses(-1)
         #wait=input("supprimer dernier test dans fichier")
-        return nom_fichier
+        return self.nom_fichier
 
     # verification si le probleme est satisfiable
-    def verifier_sat_fichier(self,nom_fichier: str, chemin_solver: str) -> bool:
-        output = os.popen(f"{chemin_solver} ./joueur/fichiers_cnf/{nom_fichier}").read()
+    def verifier_sat_fichier(self, chemin_solver: str) -> bool:
+        output = os.popen(f"{chemin_solver} ./joueur/fichiers_cnf/{self.nom_fichier}").read()
         return "s SATISFIABLE" in output 

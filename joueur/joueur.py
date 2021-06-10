@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/10 20:46:36 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 21:01:06 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -24,8 +24,10 @@ def jouer(info_carte_courante: GridInfo, nom_carte: str, chemin_solver:str, type
     solver: solver_template
     if type_solver == "opb":
         solver = pseudo_boolean()
-    else:
+    elif type_solver == "cnf":
         solver = dimacs()
+    else:
+        raise "Solver incorrect"
         
     fichier: str = solver.initialiser_fichier_debut(info_carte_courante, nom_carte)
     
