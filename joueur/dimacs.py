@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/08 19:07:05 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 19:09:41 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -212,28 +212,24 @@ class dimacs(solver_template):
                             #si le voisin est valide alors on ajoute la variable à la liste
                             Voisin.append(self.generer_variable_avec_position_et_type((i+cpt1, j+cpt2), animal, m, n))
 
+                for c in combinations(Voisin, len(Voisin)-proximite_comptage[animal]+1):
+                    clause:str = ""
+                    for var in c:
+                        clause+=str(var)+" "
+                    if clause:
+                        clause+="0\n"
+                    contraintes += clause
+             
                 for c in combinations(Voisin, proximite_comptage[animal]+1):
                     clause:str = ""
                     for var in c:
                         clause+=str(-var)+" "
                     if clause:
                         clause+="0\n"
-                    contraintes += clause
+                    contraintes += clause                    
 
-                if proximite_comptage[animal] > 0:
-                    
-                    for c in combinations(Voisin, proximite_comptage[animal]-1):
-                        liste_var:List[int]=deepcopy(Voisin)
-                        clause:str = ""
-                        for var in c:
-                            liste_var.remove(var)
-                        for var in liste_var:
-                            clause+=str(var)+" "
-                        if clause:
-                            clause+="0\n"
-                        contraintes += clause
-
-
+            # print(f"\n\nvoisins = \n{Voisin} \nprox = \n{proximite_comptage}\n\ncontraintes = \n{contraintes}")
+            # wait=input()
         return contraintes
 
     # initialisation du fichier pour le prochain test
@@ -256,7 +252,7 @@ class dimacs(solver_template):
             nouvelle_ligne = str(-self.generer_variable_avec_position_et_type(position, contrainte, m, n))+" 0\n"
         else:
             nouvelle_ligne += str(self.generer_variable_avec_position_et_type(position, "T", m, n))+" "
-            nouvelle_ligne += str(self.generer_variable_avec_position_et_type(position, "R", m, n))+" "
+            nouvelle_ligne += str(self.generer_variable_avec_position_et_type(position, "S", m, n))+" "
             nouvelle_ligne += str(self.generer_variable_avec_position_et_type(position, "C", m, n))+" 0\n"
         lignes[dernier]=nouvelle_ligne
         
@@ -289,7 +285,7 @@ class dimacs(solver_template):
         contraintes_non_possibles: List[str] = ["T","S","C","R"]
         contraintes_non_possibles.remove(contrainte)
         for c in contraintes_non_possibles:
-            if contrainte != "R":
+            if c != "R":
                 lignes.append(str(-self.generer_variable_avec_position_et_type(position, c, m, n))+" 0\n")
                 nb_clauses_ajoute+=1
             else:
