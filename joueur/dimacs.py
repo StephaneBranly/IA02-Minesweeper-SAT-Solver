@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/10 20:37:49 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 20:38:39 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -109,7 +109,6 @@ class dimacs(solver_template):
         nb_clause_info:int = len(texte.split('\n'))-1    #nombre de ligne dans le texte
         f = open(f"./joueur/fichiers_cnf/{nom_fichier}", "a")
         f.write(texte)
-        #wait=input("ajouter info")
         f.close()
         self.modifier_nombre_clauses(nom_fichier, nb_clause_info)
 

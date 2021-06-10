@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/10 19:55:42 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 20:45:54 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -23,63 +23,66 @@ class solver_template():
         self.carte_connue: List[List[List[str]]]
         self.comptage_animaux_carte_total: List[int]
         self.comptage_animaux_carte_actuel: List[int]
+        self.n: int = 0
+        self.m: int = 0
+        self.nom_fichier: str = ""
 
      # initialisation du fichier .opb
-    def initialiser_fichier_debut(self,infos_grille: GridInfo, nom_carte: str = "") -> str:
+    def initialiser_fichier_debut(self, infos_grille: GridInfo, nom_carte: str = "") -> str:
         pass
     
     # ajout de chaque informatiom dans le fichier
-    def ajouter_informations_dans_fichier(self,nom_fichier:str, infos: Infos, m: int, n: int) -> str:
+    def ajouter_informations_dans_fichier(self, infos: Infos) -> str:
         pass
 
     # generateur clause de comptage    
-    def generer_clause_nb_type(self,nb_animal: int, type_var: str, m: int, n:int) -> str:
+    def generer_clause_nb_type(self, nb_animal: int, type_var: str) -> str:
         pass
 
     # generateur de variable pour position(i,j) et type variable
-    def generer_variable_avec_position_et_type(self,position: Coord, type_var: str, m: int, n: int) -> str:
+    def generer_variable_avec_position_et_type(self,position: Coord, type_var: str) -> str:
         pass
 
     # les differents generateurs de clauses essentielles
-    def generer_contrainte_unicite_animal(self,position: Coord, m: int, n: int) -> str:
+    def generer_contrainte_unicite_animal(self,position: Coord) -> str:
         pass
 
-    def generer_contrainte_unicite_terrain(self,position: Coord, m: int, n: int) -> str:
+    def generer_contrainte_unicite_terrain(self,position: Coord) -> str:
         pass
 
-    def generer_implication_animal_terrain(self,position: Coord, m: int, n: int) -> str:
+    def generer_implication_animal_terrain(self,position: Coord) -> str:
         pass
 
-    def generer_information_depart(self,position: Coord, m: int, n:int) -> str:
+    def generer_information_depart(self,position: Coord) -> str:
         pass
 
     # generateur de contraintes en fonction des informations obtenues
-    def generer_contraintes_information(self,info: Info, m: int, n: int) -> str:
+    def generer_contraintes_information(self,info: Info) -> str:
         pass
 
     # initialisation du fichier pour le prochain test
-    def initialiser_test_dans_fichier(self,nom_fichier: str) -> str:
+    def initialiser_test_dans_fichier(self) -> str:
         pass
 
     # modification de la derniere ligne pour la remplacer avec le test demande
-    def ajouter_test_dans_fichier(self,nom_fichier:str, contrainte:str, position: Coord, m: int, n: int) -> str:
+    def ajouter_test_dans_fichier(self, contrainte:str, position: Coord) -> str:
         pass
         
     # sauvegarde de l'hypothese qui a ete testee et validee
-    def conserver_test_dans_fichier(self,nom_fichier:str, contrainte:str, position: Coord, m: int, n: int) -> str:
+    def conserver_test_dans_fichier(self, contrainte:str, position: Coord) -> str:
         pass
 
     # suppression de la derniere ligne de test
-    def supprimer_dernier_test_dans_fichier(self,nom_fichier: str) -> str:
+    def supprimer_dernier_test_dans_fichier(self) -> str:
         pass
 
     # verification de position valide
-    def verifier_position_correcte(self,position: Coord, m: int, n: int) -> bool:
-        return not (position[0]<0 or position[0]>= m 
-        or position[1]<0 or position[1]>= n)
+    def verifier_position_correcte(self,position: Coord) -> bool:
+        return not (position[0]<0 or position[0]>= self.m 
+        or position[1]<0 or position[1]>= self.n)
 
     # verification si le probleme est satisfiable
-    def verifier_sat_fichier(self,nom_fichier: str, chemin_solver: str) -> bool:
+    def verifier_sat_fichier(self, chemin_solver: str) -> bool:
         pass
 
     
@@ -119,20 +122,20 @@ class solver_template():
         return True
 
     # generateur d'hypothese sur la case
-    def hypothese_sur_case(self, fichier: str, position: Coord, m:int, n: int, chemin_solver:str):
+    def hypothese_sur_case(self, position: Coord, chemin_solver:str):
         action = None
         resultat: bool
         hyp_resultat: str = None
-        self.initialiser_test_dans_fichier(fichier)
+        self.initialiser_test_dans_fichier()
         for hyp in ['T','S','C','R']: # pour toutes les hypotheses possibles
             if self.vaut_le_coup_de_tester(hyp,position):
-                self.ajouter_test_dans_fichier(fichier,hyp,position,m,n)
-                resultat = self.verifier_sat_fichier(fichier,chemin_solver)
+                self.ajouter_test_dans_fichier(hyp,position)
+                resultat = self.verifier_sat_fichier(chemin_solver)
                 if not resultat:
                     hyp_resultat = hyp
                     if hyp == "R":
                         action = "d"
                     else:
                         action = "g"
-        self.supprimer_dernier_test_dans_fichier(fichier)
+        self.supprimer_dernier_test_dans_fichier()
         return action, hyp_resultat
