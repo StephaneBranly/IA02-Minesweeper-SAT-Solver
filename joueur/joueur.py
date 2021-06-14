@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/08 19:17:21 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 22:27:17 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -24,8 +24,10 @@ def jouer(info_carte_courante: GridInfo, nom_carte: str, chemin_solver:str, type
     solver: solver_template
     if type_solver == "opb":
         solver = pseudo_boolean()
-    else:
+    elif type_solver == "cnf":
         solver = dimacs()
+    else:
+        raise "Solver incorrect"
         
     fichier: str = solver.initialiser_fichier_debut(info_carte_courante, nom_carte)
     
@@ -42,7 +44,7 @@ def jouer(info_carte_courante: GridInfo, nom_carte: str, chemin_solver:str, type
         # analyse des cases a tester (pour lesquelles on a eu de nouvelles informations)
         for case_actuelle in cases_a_tester: 
             if not solver.verifier_si_case_exploree(case_actuelle):
-                action, hyp_resultat = solver.hypothese_sur_case(fichier,case_actuelle,m,n,chemin_solver)
+                action, hyp_resultat = solver.hypothese_sur_case(case_actuelle,chemin_solver)
                 if action: # sauvegarde de la position si bonne action
                     i_resultat = case_actuelle[0]
                     j_resultat = case_actuelle[1]
@@ -55,7 +57,7 @@ def jouer(info_carte_courante: GridInfo, nom_carte: str, chemin_solver:str, type
             j = 0
             while j < n and not action:
                 if not solver.verifier_si_case_exploree((i,j)):
-                    action, hyp_resultat = solver.hypothese_sur_case(fichier,(i,j),m,n,chemin_solver)
+                    action, hyp_resultat = solver.hypothese_sur_case((i,j),chemin_solver)
                     if action: # sauvegarde de la position si bonne action
                         i_resultat = i
                         j_resultat = j
@@ -73,13 +75,15 @@ def jouer(info_carte_courante: GridInfo, nom_carte: str, chemin_solver:str, type
                 solver.incrementer_comptage_animal(hyp_resultat) # on indique qu'on a trouve un nouvel animal hyp_resultat
             elif action == "d":
                 st, msg, infos = discover(i_resultat, j_resultat)
-            solver.conserver_test_dans_fichier(fichier, hyp_resultat, (i_resultat,j_resultat),m,n) # on conserve le test fait / on ajoute les informations relatives a ce test
+            solver.conserver_test_dans_fichier(hyp_resultat, (i_resultat,j_resultat)) # on conserve le test fait / on ajoute les informations relatives a ce test
             solver.indiquer_case_exploree((i_resultat,j_resultat),hyp_resultat) # on indique que la case est maintenant visitee
-            solver.ajouter_informations_dans_fichier(fichier, infos, m, n) # on ajoute les informations obtenues a l'issu de l'action
+            solver.ajouter_informations_dans_fichier(infos) # on ajoute les informations obtenues a l'issu de l'action
             for info in infos:
                 if info['pos'] not in cases_a_tester and not solver.verifier_si_case_exploree(info['pos']):
                     cases_a_tester.insert(0,info['pos']) # on indique les nouvelles positions a analyser
-
+        else:
+            print(f"{couleurs.KO}Pas de mouvement trouve{couleurs.FIN}")
+            return "KO"
         if st == "KO" or st == "GG":
             return st
     return "KO"    

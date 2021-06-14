@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/06 17:37:00 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/10 19:56:42 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -36,17 +36,17 @@ def sauvegarder_historique(nom_fichier: str) -> bool:
             f.write(f"#{compteur}\t{action}\n")
             compteur += 1
         f.close()
-        historique = []
         return True
     except:
         return False
 
 def lecteur_de_map(chemin_fichier: str) -> Tuple[GridInfo,Grid]:
+    global historique
     try:
         with open(chemin_fichier) as fichier:
             info_carte: Dict = dict()
             carte: Grid = list(list(dict()))
-            
+            historique = []
             numero_ligne: int = -1
 
             for ligne in fichier:
