@@ -52,7 +52,7 @@ Résolution d'un problème style démineur.
     - Lecture limitée au strict minimum
     - Edition en `append` quand possible (pour éviter de devoir tout réécrire) 
     - Sauvegarde de la position du curseur pour tester et modifier les hypothèses
-    - (dimacs) ne pas ajouter une clause si elle est déjà dans le fichier (en particulier dans ajouter_infos !)
+    - (dimacs) ne pas ajouter une clause si elle est déjà dans le fichier
 - Sélection des cases à tester
     - Les cases ayant recues les dernieres informations sont testées en priorité
 - Test des hypothèses sur une case
