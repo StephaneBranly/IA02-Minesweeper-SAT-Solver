@@ -8,11 +8,12 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/10 22:49:55 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/15 13:07:24 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
 import sys, getopt, os
+from test.generer_cartes import generer_cartes
 from test.test import test
 from types_perso.types_perso import *
 
@@ -33,9 +34,8 @@ def main(argv):
     chemin_serveur: str = ""
     type_solver: str = ""
     type_test: str = ""
-    
     try:
-        opts, args = getopt.getopt(argv,"ht:o:s:",["Type=","OS=","Solver="])
+        opts, args = getopt.getopt(argv,"ht:o:s:g:",["Type=","OS=","Solver=","NombreCartes="])
     except getopt.GetoptError:
         aide()
         sys.exit(2)
@@ -50,6 +50,8 @@ def main(argv):
             nom_os = arg
         elif opt in ("-s","--Solver"):
             type_solver = arg
+        elif opt in ("-g","--NombreCartes"):
+            generer_cartes(int(arg))
 
     if(nom_os=='linux'):
         chemin_serveur = "/test/serveur/linux64/crocomine-lite-alpha"
