@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/10 22:26:45 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/15 17:30:59 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -17,6 +17,7 @@ import os
 from types_perso.types_perso import *
 from typing import List
 from itertools import combinations
+from shutil import copy, copyfile
 
 #pour une case les variables sont: [sea land croco tigre requin découverte]
 
@@ -46,7 +47,6 @@ class dimacs(solver_template):
             self.nom_fichier: str = f"{nom_carte}.cnf"
         else:
             self.nom_fichier: str = f"f.cnf"
-        f = open(f"./joueur/fichiers_cnf/{self.nom_fichier}", "w", newline='\n') # ouverture en "write", ecrase l'ancien si existant
         self.n: int = infos_grille["n"]
         self.m: int = infos_grille["m"]  
         self.nb_var=self.m*self.n*6  
@@ -60,9 +60,7 @@ class dimacs(solver_template):
                 rang.append([0,0])
                 flatList.append([i,j])
             self.carte_connue.append(rang)
-        f.write(f"c {nom_carte}.map\n")
 
-        texte:str = ""
 
         # ajout des clauses de comptage
         # texte+=(self.generer_clause_nb_type(infos_grille["tiger_count"],"T",flatList))
@@ -75,23 +73,36 @@ class dimacs(solver_template):
         self.comptage_animaux_carte_total = [infos_grille["tiger_count"],infos_grille["shark_count"],infos_grille["croco_count"]]
         self.comptage_animaux_carte_actuel = [0,0,0]
 
+        if not os.path.isfile(f"./joueur/templates_cnf/carte_{self.n}x{self.m}.cnf"):
+            self.generer_template_carte(self.n, self.m)
+        copyfile(f"./joueur/templates_cnf/carte_{self.n}x{self.m}.cnf", f"./joueur/fichiers_cnf/{self.nom_fichier}")
+        self.nb_clause = self.n * self.m *(3+2+4)
+        f = open(f"./joueur/fichiers_cnf/{self.nom_fichier}", "a", newline='\n') # ouverture en "append", ajout en fin de fichier
+        # ajout de l'information sur la case de debut
+        f.write(self.generer_information_depart(infos_grille['start']))
+        
+        
+        # TODO, voir pour ajouter informations obtenues au debut de la map
+               
+        f.close()
+        return self.nom_fichier
+
+    def generer_template_carte(self, n: int, m: int) -> str:
+        nom_template: str = f"carte_{n}x{m}.cnf"
+        f = open(f"./joueur/templates_cnf/{nom_template}", "w", newline='\n') # ouverture en "write", ecrase l'ancien si existant
+        texte: str = ''
         # ajout des clauses pour chaque case (animal, terrain, animal -> terrain)
-        for i in range(infos_grille["m"]):
-            for j in range(infos_grille['n']):
+        for i in range(m):
+            for j in range(n):
                 texte+=(self.generer_contrainte_unicite_animal((i,j)))
                 texte+=(self.generer_contrainte_unicite_terrain((i,j)))
                 texte+=(self.generer_implication_animal_terrain((i,j)))
-
-        # ajout de l'information sur la case de debut
-        texte+=(self.generer_information_depart(infos_grille['start']))
-
-        # TODO, voir pour ajouter informations obtenues au debut de la map
-       
         f.write(f"p cnf {self.nb_var} {self.nb_clause}\n")
         f.write(texte)
-        
+
         f.close()
-        return self.nom_fichier
+        return nom_template
+
 
     # ajout de chaque informatiom dans le fichier
     def ajouter_informations_dans_fichier(self, infos: Infos) -> str:
@@ -173,7 +184,8 @@ class dimacs(solver_template):
     def generer_contrainte_unicite_terrain(self,position: Coord) -> str:
         var_ij:List[int] = self.generer_variables_avec_position(position) #recupere toute les variables liées à la case (i,j)
         var:list[int] = [var_ij[0], var_ij[1]] #recupère juste les variables liées aux terrin présents sur (i,j)
-        bc:str = str(self.au_plus_un(var))
+        bc:str = f"-{var[0]} -{var[1]} 0\n{var[0]} {var[1]} 0\n"
+        self.nb_clause += 2
         return bc
 
     def generer_implication_animal_terrain(self,position: Coord) -> str:
