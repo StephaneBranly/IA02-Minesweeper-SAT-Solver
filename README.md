@@ -38,12 +38,14 @@ Résolution d'un problème style démineur.
     - utiliser si possible sur VS Code l'extension UTC-Header [github extension](https://github.com/StephaneBranly/vscode-utc-header)
 
 ## TO DO 
-- [ ] voir le fonctionnement de l'API
+- [x] voir le fonctionnement de l'API
 - [x] faire en sorte que l'on peut effectuer des tests facilement sur une multitude de maps créées en local
 - [ ] etudier la parallelisation / creation de `thread`
-- [ ] tester en cnf pour comparer les performances
+- [x] tester en cnf pour comparer les performances
 - [ ] effectuer un test en priorite sur le type d'animal le plus present sur le reste de la map `(T,S,C,R)` => R pour rien
 - [ ] avant test final, retirer les commentaires dans le fichier
+- [ ] pre-calculer tous les fichiers contenant les contraintes initiales d'unicite des cellules pour les maps de taille n*m avec n et m dans [1;50]
+- retirer une variable non utilisee dans cnf
 
 ## Optimisations actuelles
 - Gestion du fichier
