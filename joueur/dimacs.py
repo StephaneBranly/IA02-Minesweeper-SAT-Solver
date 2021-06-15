@@ -33,7 +33,7 @@ class dimacs(solver_template):
         lignes:List[str] = f.readlines() #sauvegarde du contenu du fichier
         f.close()
 
-        lignes[0]=f"p cnf {self.nb_var} {self.nb_clause}\n" #modification de la ligne avec le nouveau nombre de clause
+        lignes[1]=f"p cnf {self.nb_var} {self.nb_clause}\n" #modification de la ligne avec le nouveau nombre de clause
 
         #écriture dans le fichier des lignes déjà présente et de nos nouvelles clauses
         f = open(f"./joueur/fichiers_cnf/{self.nom_fichier}", "w", newline='\n')
