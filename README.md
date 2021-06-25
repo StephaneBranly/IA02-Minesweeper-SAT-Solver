@@ -86,7 +86,7 @@ Dans le dossier `./test/` se trouvent les outils utilisés pour effectuer les te
     - Utilisation de `Glucose` au lieu de `Gophersat` (indiqué comme 2 à 5 fois plus rapide)
         - Glucose personnalisé dispo ici : [glucose-syrup-4.1](https://github.com/StephaneBranly/glucose-syrup-4.1)
     - Recompilation du solveur en changeant le contenu de `stdout` (`0`|`1`|`2` au lieu de `s UNSATISFIABLE`|`s SATISFIABLE` + informations superflux)
-    - Recompilation du solveur pour changer les arguments : `solver fichier.cnf nb_vars nb_clauses "clause a tester"` (parallèle)
+    - Recompilation du solveur pour changer les arguments : `solver fichier.cnf nb_clauses "clause a tester"` (parallèle)
 
 
 
