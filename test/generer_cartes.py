@@ -8,12 +8,11 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/15 13:14:33 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/24 23:00:47 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
 import random
-import os
 from typing import List
 from datetime import datetime
 
@@ -26,16 +25,21 @@ def generer_cartes(nombre_cartes: int) -> List[str]:
         noms_cartes.append(generer_carte(nom_carte))
     return noms_cartes
 
-    
 def generer_carte(nom_carte: str) -> str:
-    f = open(f"./test/grids/{nom_carte}", "w", newline='\n')
-    n = random.randint(5,50)
-    m = random.randint(5,50)
+    # DEBUT PARAMETRES
+    n = random.randint(5,15)
+    m = random.randint(5,15)
+    pourcentage_animaux: int = random.randint(0,30)
+    pourcentage_eau: int = random.randint(0,50)
+    # FIN PARAMETRES
+
+
     carte: List[List[str]] = []
+
     for i in range(m):
         ligne: List[str] = []
         for j in range(n):
-            if random.randint(0,1):
+            if random.randint(0,100) < pourcentage_eau:
                 type_terrain = "~"
             else:
                 type_terrain = "-"
@@ -47,10 +51,9 @@ def generer_carte(nom_carte: str) -> str:
     x_depart: int = random.randint(0,m-1)
     y_depart: int = random.randint(0,n-1)
     
-    max:int = n*m-9 - int(n*m*0.75)
-    if max < 1: 
-        max = 0
-    nombre_animaux: int = random.randint(0,max)
+    nombre_animaux:int = int(n*m*pourcentage_animaux/100) - 9
+    if nombre_animaux < 1: 
+        nombre_animaux = 0
     for a in range(nombre_animaux):
         x_pos_animal: int = x_depart
         y_pos_animal: int = y_depart
@@ -67,7 +70,9 @@ def generer_carte(nom_carte: str) -> str:
                 carte[x_pos_animal][y_pos_animal] = "S"
             else:
                 carte[x_pos_animal][y_pos_animal] = "T"
-    f.write(f"{nom_carte}\n")
+    pourcentage_animaux = int(nombre_animaux/(n*m)*100)
+    f = open(f"./grilles/croco/gen/t_{n*m}_p_{pourcentage_animaux}_r_{nom_carte}", "w", newline='\n')
+    f.write(f"{nom_carte}| %animaux ~= {pourcentage_animaux}, | %eau ~= {pourcentage_eau}\n")
     f.write(f"{m} {n}\n")
     f.write(f"{x_depart} {y_depart}\n")
     for l in carte:
