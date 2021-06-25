@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/25 14:21:39 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/25 16:44:17 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -39,14 +39,12 @@ class Dimacs(Solver_template):
         self.nb_var=self.m*self.n*3
         self.nombre_cases_restantes = self.n * self.m
         
-        flatList = []
         #initialisation de la carte a vide
         self.carte_connue = []
         for i in range(self.m):
             rang = []
             for j in range(self.n):
                 rang.append([0,0,None])
-                flatList.append([i,j])
             self.carte_connue.append(rang)
         f.write(f"c {nom_carte}.map\n")
 
