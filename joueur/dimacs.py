@@ -308,8 +308,8 @@ class Dimacs(Solver_template):
     # verification si le probleme est satisfiable
     def verifier_sat_fichier(self, chemin_solver: str, clause_sup = "") -> bool:
         # /!\ WINDOWS, REMETTRE LIGNE EN DESSOUS
-        # output = os.popen(f"{chemin_solver} ./joueur/fichiers_cnf/{self.nom_fichier} | grep \"s [A-Z]\"").read()
-        # return output[2] == "S" #pour verifier si output == "s SATISFIABLE"
+        # output = os.popen(f"{chemin_solver} ./joueur/fichiers_cnf/{self.nom_fichier}").read()
+        # return "s SATISFIABLE" in output #pour verifier si output == "s SATISFIABLE"
         
         if clause_sup != "":
             output = os.popen(f"{chemin_solver} ./joueur/fichiers_cnf/{self.nom_fichier} {self.nb_clause} \"{clause_sup}\"").read()
