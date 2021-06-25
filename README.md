@@ -92,3 +92,21 @@ Dans le dossier `./test/` se trouvent les outils utilisés pour effectuer les te
 
 ## Comparaison des performances
 ![Performances](Documents_divers/perfs.png)
+Informations sur les courbes:
+| Nom courbe  | Amélioration apportée |
+| ------------- | ------------- |
+| cnf-20210618_024118 | version initiale aux tests de performances |
+| cnf-20210618_192155 | changement ordre priorite des tests |
+| cnf-20210618_195739 | guess effectues a la toute fin |
+| cnf-20210619_005743 | utilisation de glucose-simp recompile en changeant l'output |
+| cnf-20210622_204835 | meilleure gestion de la liste des cases a tester |
+| cnf-20210623_194342 | nombre de variable passe a 3 / pour cnf |
+| cnf-20210623_223619 | recompilation de glucose pour utiliser des arguments |
+| cnf-20210624_024010 | parallelisation |
+
+
+
+
+
+
+
