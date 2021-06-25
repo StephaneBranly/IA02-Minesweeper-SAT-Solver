@@ -8,6 +8,27 @@ Résolution d'un problème style démineur.
 
 - `git clone https://gitlab.utc.fr/branlyst/ia02-projet.git`
 
+## Pour lancer le projet 
+```python3 main.py -o macos -s cnf -t serveur -p```
+=> ```macos | windows | linux```
+=> Si utilisation du mode parallele, il faut utiliser le ```glucose``` personnalisé.
+-> dans le ```main.py```, peuvent être changés les chemins des solveurs
+
+```python3 main.py -h``` pour voir les differentes instructions possibles.
+
+## Projet 
+### Spécifités :
+- Changement du sat solver et personnalisation
+- Execution en parallele possible
+- Execution avec du pseudo boolean non parallele possible
+- Selection specifique des futurs noeuds a visiter
+- Prise en compte des probabilites pour les coups aleatoires
+
+### Pistes d'améliorations
+- Prendre en compte l'utilisation de chords
+- Utiliser une librairie Python pour avoir un solveur
+- Prendre en compte le comptage total
+
 ## Quelques infos dans le tas :
 
 - [Sujet du projet](https://hackmd.io/@ia02/By_zb5GFd)
