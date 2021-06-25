@@ -8,7 +8,7 @@
 #                                                       +++##+++::::::::::::::       +#+    +:+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       +#+    +#+     +#+     +#+             #
 #                                                         ::::::::::::::::::::       #+#    #+#     #+#     #+#    #+#      #
-#      Update: 2021/06/24 23:15:41 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
+#      Update: 2021/06/25 18:20:02 by branlyst & duranma  ::::::::::::::::::::        ########      ###      ######## .fr   #
 #                                                                                                                           #
 # ************************************************************************************************************************* #
 
@@ -68,10 +68,11 @@ def test(chemin_solver: str, type_solver:str, type_test:str, chemin_serveur:str,
                 print(f"{couleurs.KO}\tKO {couleurs.FIN}\t{couleurs.GRAS}[{temps_ecoule}]{couleurs.FIN}\ts={format(surete,'.2f')}\tTest sur {fichier}")
     else:
         historique_temps: List[Dict] = []
-        server = "http://localhost:8000"
+        server = "http://croco.lagrue.ninja:80"
         group = "Groupe 33"
-        members = "branlyst & duranmar"
-        croco = CrocomineClient(server, group, members)
+        members = "BRANLY Stephane & DURAND Marion"
+        passwd = "mondeParalleleCommeNotreAlgo"
+        croco = CrocomineClient(server, group, members, passwd)
         status, Msg, info_carte_courante = croco.new_grid()
        
         while status == "OK":
